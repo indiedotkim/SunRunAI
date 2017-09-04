@@ -1,0 +1,226 @@
+package com.burntrac.sunrunai;
+
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.GridView;
+import android.widget.TextView;
+
+import im.delight.android.ddp.db.Document;
+import im.delight.android.ddp.db.memory.InMemoryDatabase;
+import im.delight.android.ddp.Meteor;
+import im.delight.android.ddp.MeteorCallback;
+import im.delight.android.ddp.ResultListener;
+
+public class MainActivity extends AppCompatActivity implements MeteorCallback {
+
+    private final static String CONTEXT = "MainActivity";
+
+    private DayAdapter dayAdapter;
+
+    private String activityId;
+    private String activityPlanId;
+    private String activityTypesId;
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        GridView gridview = (GridView)findViewById(R.id.daygridview);
+        dayAdapter = new DayAdapter(gridview.getContext());
+        gridview.setAdapter(dayAdapter);
+
+        //meteor = new Meteor(this, "wss://www.burntrac.com/websocket");
+        MeteorWrapper.meteor = new Meteor(this, "ws://192.168.1.106:3000/websocket", new InMemoryDatabase());
+        MeteorWrapper.meteor.addCallback(this);
+        MeteorWrapper.meteor.connect();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_intro, null);
+        builder.setView(view);
+        builder.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //Intent i = new Intent(getApplicationContext(), PlanActivity.class);
+                //startActivity(i);
+            }
+        });
+
+        dialog.show();
+
+        /*
+        final WebView chart = (WebView)findViewById(R.id.ChartWebView);
+        chart.getSettings().setJavaScriptEnabled(true);
+        chart.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                chart.evaluateJavascript("document.getElementsByTagName(\"h1\")[0].innerHTML = \"HI!\";", null);
+            }
+        });
+        String html = "<html><head><title>Bla</title></head><body><h1>Test!</h1><p>Hello!</p></body></html>";
+        chart.loadData(html, "text/html", null);
+         */
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.settings:
+                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onConnect(boolean signedInAutomatically) {
+        Log.d(CONTEXT, "Connected");
+        Log.d(CONTEXT, "Is logged in: "+ MeteorWrapper.meteor.isLoggedIn());
+        Log.d(CONTEXT, "User ID: "+ MeteorWrapper.meteor.getUserId());
+
+        if (signedInAutomatically) {
+            Log.d(CONTEXT, "LI SUC");
+            MeteorWrapper.meteor.logout();
+            signedInAutomatically = false;
+            Log.d(CONTEXT, "LI -> " + signedInAutomatically);
+        }
+        Log.d(CONTEXT, "XXXXXXXXXXX");
+
+        if (signedInAutomatically) {
+            Log.d(CONTEXT, "Successfully logged in automatically");
+        }
+        else {
+            MeteorWrapper.meteor.loginWithEmail("test4@indie.kim", "abcdef", new ResultListener() {
+
+                @Override
+                public void onSuccess(String result) {
+                    Log.d(CONTEXT, "Successfully logged in: "+result);
+                }
+
+                @Override
+                public void onError(String error, String reason, String details) {
+                    Log.d(CONTEXT, "Could not log in: "+error+" / "+reason+" / "+details);
+                }
+
+            });
+        }
+
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+
+        from.setTimeZone(TimeZone.getTimeZone("GMT"));
+        from.add(Calendar.MONTH, -1);
+        from.set(Calendar.HOUR_OF_DAY, 0);
+        from.set(Calendar.MINUTE, 0);
+        from.set(Calendar.SECOND, 0);
+
+        to.setTimeZone(TimeZone.getTimeZone("GMT"));
+        to.set(Calendar.HOUR_OF_DAY, 23);
+        to.set(Calendar.MINUTE, 59);
+        to.set(Calendar.SECOND, 59);
+
+        activityId = MeteorWrapper.meteor.subscribe("activity", new Object[] { from.getTime(), to.getTime() });
+
+        // offset, limit, createdBy, types, goals
+        activityPlanId = MeteorWrapper.meteor.subscribe("activityplan", new Object[] {  0, 10, null, null, null });
+
+        activityTypesId = MeteorWrapper.meteor.subscribe("activitytypes");
+
+        // call an arbitrary method
+        //meteor.call("myMethod");
+    }
+
+    @Override
+    public void onDestroy() {
+        MeteorWrapper.meteor.unsubscribe(activityId);
+        MeteorWrapper.meteor.unsubscribe(activityTypesId);
+
+        MeteorWrapper.meteor.disconnect();
+        MeteorWrapper.meteor.removeCallback(this);
+        // or
+        // meteor.removeCallbacks();
+
+        // ...
+
+        super.onDestroy();
+    }
+
+    @Override
+    public void onException(Exception e) {
+        System.out.println("Exception");
+        if (e != null) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDisconnect() {
+        System.out.println("Disconnected");
+    }
+
+    public synchronized void onDataAdded(String collectionName, String documentID, String newValuesJson) {
+        // parse the JSON and manage the data yourself (not recommended)
+        // or
+        // enable a database (see section "Using databases to manage data") (recommended)
+        Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
+        Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
+        Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
+        Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
+
+        if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
+            Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
+            Log.d(CONTEXT, "x");
+        }
+
+        dayAdapter.notifyDataSetChanged();
+    }
+
+    public synchronized void onDataChanged(String collectionName, String documentID, String updatedValuesJson, String removedValuesJson) {
+        // parse the JSON and manage the data yourself (not recommended)
+        // or
+        // enable a database (see section "Using databases to manage data") (recommended)
+        Log.d(CONTEXT, "Changed: " + collectionName + ", " + documentID + ", " + updatedValuesJson);
+    }
+
+    public synchronized void onDataRemoved(String collectionName, String documentID) {
+        // parse the JSON and manage the data yourself (not recommended)
+        // or
+        // enable a database (see section "Using databases to manage data") (recommended)
+        Log.d(CONTEXT, "Removed: " + collectionName + ", " + documentID);
+    }
+}

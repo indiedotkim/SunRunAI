@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="temp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/rain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="rain"
+        tools:layout_editor_absoluteY="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/temperature"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:id="@+id/winddirection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="x"
+        tools:layout_editor_absoluteY="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/windspeed"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:id="@+id/windspeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="wind"
+        tools:layout_editor_absoluteY="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/rain"
+        android:layout_marginLeft="8dp" />
+
+    <GridView
+        android:id="@+id/dayactivitylist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/temperature" />
+
+</android.support.constraint.ConstraintLayout>

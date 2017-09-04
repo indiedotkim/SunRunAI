@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bt_activity_icon_yoga">ic_sport_icon_03"</string>
+    <string name="bt_activity_icon_cycling">ic_sport_icon_35"</string>
+    <string name="bt_activity_icon_gym">ic_sport_icon_44"</string>
+    <string name="bt_activity_icon_climbing">ic_sport_icon_53"</string>
+    <string name="bt_activity_icon_walking">ic_sport_icon_54"</string>
+    <string name="bt_activity_icon_swimming">ic_sport_icon_59"</string>
+    <string name="bt_activity_icon_boxing">ic_sport_icon_62"</string>
+    <string name="bt_activity_icon_running">ic_sport_icon_63"</string>
+    <declare-styleable name="ActivityView">
+    </declare-styleable>
+</resources>
