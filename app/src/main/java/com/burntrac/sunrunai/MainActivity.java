@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
+                Log.d("x", "y");
                 //Intent i = new Intent(getApplicationContext(), PlanActivity.class);
                 //startActivity(i);
             }
@@ -163,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
 
         // call an arbitrary method
         //meteor.call("myMethod");
+
+        WeatherWrapper.getJSONObject(this.getApplicationContext());
+        Log.d(CONTEXT, "DONE!");
     }
 
     @Override

@@ -20,6 +20,11 @@
         </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".PlanActivity"></activity>
+
+        <service
+            android:name=".WeatherIntentService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
