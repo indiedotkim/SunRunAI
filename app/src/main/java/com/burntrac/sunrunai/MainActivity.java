@@ -3,10 +3,16 @@ package com.burntrac.sunrunai;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -29,9 +35,12 @@ import im.delight.android.ddp.Meteor;
 import im.delight.android.ddp.MeteorCallback;
 import im.delight.android.ddp.ResultListener;
 
-public class MainActivity extends AppCompatActivity implements MeteorCallback {
+public class MainActivity extends AppCompatActivity implements MeteorCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final static String CONTEXT = "MainActivity";
+
+    private LocationManager mLocationManager;
+    private LocationListener mLocationListener;
 
     private DayAdapter dayAdapter;
 
@@ -45,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        GridView gridview = (GridView)findViewById(R.id.daygridview);
+        GridView gridview = (GridView) findViewById(R.id.daygridview);
         dayAdapter = new DayAdapter(gridview.getContext());
         gridview.setAdapter(dayAdapter);
 
@@ -67,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                Log.d("x", "y");
                 //Intent i = new Intent(getApplicationContext(), PlanActivity.class);
                 //startActivity(i);
             }
@@ -111,8 +119,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
     @Override
     public void onConnect(boolean signedInAutomatically) {
         Log.d(CONTEXT, "Connected");
-        Log.d(CONTEXT, "Is logged in: "+ MeteorWrapper.meteor.isLoggedIn());
-        Log.d(CONTEXT, "User ID: "+ MeteorWrapper.meteor.getUserId());
+        Log.d(CONTEXT, "Is logged in: " + MeteorWrapper.meteor.isLoggedIn());
+        Log.d(CONTEXT, "User ID: " + MeteorWrapper.meteor.getUserId());
 
         if (signedInAutomatically) {
             Log.d(CONTEXT, "LI SUC");
@@ -124,18 +132,17 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
 
         if (signedInAutomatically) {
             Log.d(CONTEXT, "Successfully logged in automatically");
-        }
-        else {
+        } else {
             MeteorWrapper.meteor.loginWithEmail("test4@indie.kim", "abcdef", new ResultListener() {
 
                 @Override
                 public void onSuccess(String result) {
-                    Log.d(CONTEXT, "Successfully logged in: "+result);
+                    Log.d(CONTEXT, "Successfully logged in: " + result);
                 }
 
                 @Override
                 public void onError(String error, String reason, String details) {
-                    Log.d(CONTEXT, "Could not log in: "+error+" / "+reason+" / "+details);
+                    Log.d(CONTEXT, "Could not log in: " + error + " / " + reason + " / " + details);
                 }
 
             });
@@ -155,18 +162,40 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
         to.set(Calendar.MINUTE, 59);
         to.set(Calendar.SECOND, 59);
 
-        activityId = MeteorWrapper.meteor.subscribe("activity", new Object[] { from.getTime(), to.getTime() });
+        activityId = MeteorWrapper.meteor.subscribe("activity", new Object[]{from.getTime(), to.getTime()});
 
         // offset, limit, createdBy, types, goals
-        activityPlanId = MeteorWrapper.meteor.subscribe("activityplan", new Object[] {  0, 10, null, null, null });
+        activityPlanId = MeteorWrapper.meteor.subscribe("activityplan", new Object[]{0, 10, null, null, null});
 
         activityTypesId = MeteorWrapper.meteor.subscribe("activitytypes");
 
         // call an arbitrary method
         //meteor.call("myMethod");
 
-        WeatherWrapper.getJSONObject(this.getApplicationContext());
-        Log.d(CONTEXT, "DONE!");
+        mLocationManager = (LocationManager)this.getSystemService(android.content.Context.LOCATION_SERVICE);
+
+        mLocationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                if (location == null) {
+                    getLocation();
+                }
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        getLocation();
+
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+        //WeatherWrapper.getJSONObject(this.getApplicationContext());
     }
 
     @Override
@@ -195,6 +224,39 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback {
     @Override
     public void onDisconnect() {
         System.out.println("Disconnected");
+    }
+
+    private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 200);
+            return;
+        }
+
+        //mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 1000, mLocationListener);
+
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (location != null) {
+            Log.d(CONTEXT, location.toString());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 200: {
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation();
+                }
+            }
+        }
     }
 
     public synchronized void onDataAdded(String collectionName, String documentID, String newValuesJson) {

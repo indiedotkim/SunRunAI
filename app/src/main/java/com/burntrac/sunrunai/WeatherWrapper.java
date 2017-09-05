@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -22,18 +25,37 @@ import java.util.List;
  * Created by kim on 8/29/17.
  */
 
-public class WeatherWrapper {
+public class WeatherWrapper extends ResultReceiver {
+
+    public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
+
+    private WeatherWrapper(Handler handler) {
+        super(handler);
+    }
+
+    @Override
+    protected void onReceiveResult(int resultCode, Bundle resultData) {
+        //super.onReceiveResult(resultCode, resultData);
+        if (resultCode == WeatherIntentService.SUCCESS) {
+            try {
+                JSONObject apiResult = new JSONObject(resultData.getString("json"));
+
+                forecasts.add(apiResult);
+            }
+            catch(JSONException je) {
+
+            }
+        } else {
+            Log.d("WW", "Error: " + resultCode);
+        }
+
+    }
 
     public static void getJSONObject(Context context) {
-        WeatherIntentService service = new WeatherIntentService();
-        //mReceiver.setReceiver(this);
-        Intent intent = new Intent(context, WeatherIntentService.class);
+        WeatherWrapper receiver = new WeatherWrapper(new Handler());
 
-        /* Send optional extras to Download IntentService
-        intent.putExtra("url", url);
-        intent.putExtra("receiver", mReceiver);
-        intent.putExtra("requestId", 101);
-        */
+        Intent intent = new Intent(context, WeatherIntentService.class);
+        intent.putExtra("receiver", receiver);
 
         context.startService(intent);
     }
