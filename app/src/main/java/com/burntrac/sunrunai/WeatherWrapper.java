@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +28,7 @@ import java.util.List;
 
 public class WeatherWrapper extends ResultReceiver {
 
+    public static JSONObject today = null;
     public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
 
     private WeatherWrapper(Handler handler) {
@@ -37,21 +39,50 @@ public class WeatherWrapper extends ResultReceiver {
     protected void onReceiveResult(int resultCode, Bundle resultData) {
         //super.onReceiveResult(resultCode, resultData);
         if (resultCode == WeatherIntentService.SUCCESS) {
-            try {
-                JSONObject apiResult = new JSONObject(resultData.getString("json"));
+            for (String operation : WeatherIntentService.QUERIES) {
+                try {
+                    String resultString = resultData.getString(operation);
 
-                forecasts.add(apiResult);
-            }
-            catch(JSONException je) {
+                    if (resultString == null) {
+                        continue;
+                    }
 
+                    JSONObject apiResult = new JSONObject(resultString);
+
+                    if (apiResult.has("forecasts")) {
+                        forecasts.clear();
+
+                        JSONArray apiArray = (JSONArray)apiResult.get("forecasts");
+                        for (int i = 0; i < apiArray.length(); i++) {
+                            forecasts.add((JSONObject) apiArray.get(i));
+                        }
+                    } else if (apiResult.has("observation")) {
+                        today = (JSONObject) apiResult.get("observation");
+                    } else {
+                        // Not supported; not implemented.
+                    }
+                } catch (JSONException je) {
+
+                }
             }
         } else {
             Log.d("WW", "Error: " + resultCode);
         }
 
+        Log.d("WW", "Done.");
     }
 
-    public static void getJSONObject(Context context) {
+    private static JSONObject getForecast() {
+        if (forecasts.size() == 0) {
+            return null;
+        }
+
+        JSONObject forecast = forecasts.get(0);
+
+        return forecast;
+    }
+
+    public static void update(Context context) {
         WeatherWrapper receiver = new WeatherWrapper(new Handler());
 
         Intent intent = new Intent(context, WeatherIntentService.class);
@@ -61,18 +92,62 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static String getRain() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
         return "12mm";
     }
 
     public static String getTemperature() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
+        return "12°C";
+    }
+
+    public static String getTemperatureMin() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
+        return "12°C";
+    }
+
+    public static String getTemperatureMax() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
         return "12°C";
     }
 
     public static String getWindDirection() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
         return "NW";
     }
 
     public static String getWindSpeed() {
+        JSONObject forecast = getForecast();
+
+        if (forecast == null) {
+            return "";
+        }
+
         return "12kph";
     }
 }

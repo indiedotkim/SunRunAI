@@ -19,15 +19,11 @@ import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import im.delight.android.ddp.db.Document;
 import im.delight.android.ddp.db.memory.InMemoryDatabase;
@@ -42,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
 
+    private ActivityHelper mActivityHelper;
     private DayAdapter dayAdapter;
 
     private String activityId;
@@ -53,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mActivityHelper = new ActivityHelper(getApplicationContext());
+        mActivityHelper.getActivities();
 
         GridView gridview = (GridView) findViewById(R.id.daygridview);
         dayAdapter = new DayAdapter(gridview.getContext());
@@ -174,11 +174,16 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         mLocationManager = (LocationManager)this.getSystemService(android.content.Context.LOCATION_SERVICE);
 
+        final MainActivity self = this;
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 if (location == null) {
-                    getLocation();
+                    return;
                 }
+
+                WeatherIntentService.location = location;
+
+                WeatherWrapper.update(self.getApplicationContext());
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -194,8 +199,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         getLocation();
 
         //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
-        //WeatherWrapper.getJSONObject(this.getApplicationContext());
     }
 
     @Override
@@ -252,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 200: {
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getLocation();
                 }
             }
@@ -260,17 +263,19 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     }
 
     public synchronized void onDataAdded(String collectionName, String documentID, String newValuesJson) {
-        // parse the JSON and manage the data yourself (not recommended)
-        // or
-        // enable a database (see section "Using databases to manage data") (recommended)
-        Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
-        Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
-        Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
-        Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
+        synchronized (MeteorWrapper.meteor) {
+            // parse the JSON and manage the data yourself (not recommended)
+            // or
+            // enable a database (see section "Using databases to manage data") (recommended)
+            Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
+            Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
+            Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
+            Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
 
-        if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
-            Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
-            Log.d(CONTEXT, "x");
+            if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
+                Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
+                Log.d(CONTEXT, "x");
+            }
         }
 
         dayAdapter.notifyDataSetChanged();

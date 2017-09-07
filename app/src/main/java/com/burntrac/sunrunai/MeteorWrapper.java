@@ -1,5 +1,7 @@
 package com.burntrac.sunrunai;
 
+import java.util.HashMap;
+
 import im.delight.android.ddp.Meteor;
 import im.delight.android.ddp.db.Collection;
 import im.delight.android.ddp.db.Database;
@@ -30,20 +32,26 @@ public class MeteorWrapper {
     }
 
     public final static Object findKVMatch(String collectionName, String key, Object value, String field) {
-        Database database = meteor.getDatabase();
-        Collection collection = database.getCollection(collectionName);
+        Object result;
 
-        Query query = collection.whereEqual(key, value);
-        Document document = query.findOne();
+        synchronized (meteor) {
+            Database database = meteor.getDatabase();
+            Collection collection = database.getCollection(collectionName);
 
-        if (document == null) {
-            return null;
+            Query query = collection.whereEqual(key, value);
+            Document document = query.findOne();
+
+            if (document == null) {
+                return null;
+            }
+
+            if (field == null) {
+                return document;
+            }
+
+            result = document.getField(field);
         }
 
-        if (field == null) {
-            return document;
-        }
-
-        return document.getField(field);
+        return result;
     }
 }
