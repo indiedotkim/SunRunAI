@@ -1,5 +1,6 @@
 package com.burntrac.sunrunai;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
 import im.delight.android.ddp.Meteor;
@@ -20,37 +21,57 @@ public class MeteorWrapper {
             return 0;
         }
 
-        Database database = meteor.getDatabase();
+        int count = 0;
+        int retries = 10;
 
-        if (database == null) {
-            return 0;
-        }
+        do {
+            try {
+                Database database = meteor.getDatabase();
 
-        Collection collection = database.getCollection(collectionName);
+                if (database == null) {
+                    return 0;
+                }
 
-        return collection == null ? 0 : collection.count();
+                Collection collection = database.getCollection(collectionName);
+                count = collection.count();
+
+                retries = 0;
+            } catch (ConcurrentModificationException cme) {
+                retries--;
+            }
+        } while (retries > 0);
+
+        return count;
     }
 
     public final static Object findKVMatch(String collectionName, String key, Object value, String field) {
-        Object result;
+        Object result = null;
 
-        synchronized (meteor) {
-            Database database = meteor.getDatabase();
-            Collection collection = database.getCollection(collectionName);
+        int retries = 10;
 
-            Query query = collection.whereEqual(key, value);
-            Document document = query.findOne();
+        do {
+            try {
+                Database database = meteor.getDatabase();
+                Collection collection = database.getCollection(collectionName);
 
-            if (document == null) {
-                return null;
+                Query query = collection.whereEqual(key, value);
+                Document document = query.findOne();
+
+                if (document == null) {
+                    return null;
+                }
+
+                if (field == null) {
+                    return document;
+                }
+
+                result = document.getField(field);
+                retries = 0;
             }
-
-            if (field == null) {
-                return document;
+            catch (ConcurrentModificationException cme) {
+                retries--;
             }
-
-            result = document.getField(field);
-        }
+        } while (retries > 0);
 
         return result;
     }

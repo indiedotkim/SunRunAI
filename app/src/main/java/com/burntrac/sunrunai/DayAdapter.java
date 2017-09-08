@@ -9,6 +9,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import im.delight.android.ddp.db.Collection;
@@ -28,9 +29,9 @@ public class DayAdapter extends BaseAdapter {
 
     public int getCount() {
         if (MeteorWrapper.meteor == null) {
-            mItems.clear();
+            //mItems.clear();
 
-            return 0;
+            //return 0;
         }
 
         // Determine max of:
@@ -56,17 +57,18 @@ public class DayAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         DayView view;
+        ArrayList activities = new ArrayList();
+        activities.add(ActivityHelper.createActivity());
+        Date date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
 
         if (convertView == null) {
-            ArrayList activities = new ArrayList();
-            activities.add(ActivityHelper.createActivity());
-
-            view = new DayView(mContext, null, activities);
+            view = new DayView(mContext, null, date, activities);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
         } else {
             view = (DayView)convertView;
+            view.override(date, activities);
 
             mItems.put(position, view);
         }
@@ -82,6 +84,17 @@ public class DayAdapter extends BaseAdapter {
 
         for (DayView view : mItems.values()) {
             view.invalidate();
+            view.forceLayout();
         }
+    }
+
+    public Date getStartDate() {
+        Date earliest = DateHelper.getMidnight(new Date());
+
+        if (WeatherWrapper.getDaysWithDataAvailable() > 0) {
+            // Still today.
+        }
+
+        return earliest;
     }
 }

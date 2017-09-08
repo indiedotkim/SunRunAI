@@ -14,21 +14,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by kim on 8/29/17.
  */
 
 public class DayView extends LinearLayout {
+    private Date mDate;
     private View mValue;
     private ImageView mImage;
     private ArrayList mActivities;
 
     private ActivityAdapter activityAdapter;
 
-    public DayView(Context context, AttributeSet attrs, ArrayList activities) {
+    public DayView(Context context, AttributeSet attrs, Date date, ArrayList activities) {
         super(context, attrs);
 
+        mDate = date;
         mActivities = activities;
 
         TypedArray a = context.obtainStyledAttributes(attrs,
@@ -58,18 +61,34 @@ public class DayView extends LinearLayout {
 
         //mImage = (ImageView) getChildAt(2);
 
-        ((TextView)findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperature());
-        ((TextView)findViewById(R.id.rain)).setText(WeatherWrapper.getRain());
-        ((TextView)findViewById(R.id.winddirection)).setText(WeatherWrapper.getWindDirection());
-        ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed());
+        setViewValues();
+    }
+
+    public DayView(Context context) {
+        this(context, null, null, null);
+    }
+
+    public void override(Date date, ArrayList activities) {
+        mDate = date;
+        mActivities = activities;
+
+        setViewValues();
+    }
+
+    private void setViewValues() {
+        ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(mDate));
+        ((TextView)findViewById(R.id.datesuffix)).setText(DateHelper.formatDateSuffix(mDate));
+
+        ((TextView)findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperature(mDate));
+        ((TextView)findViewById(R.id.temperaturemax)).setText(WeatherWrapper.getTemperatureMax(mDate));
+        ((TextView)findViewById(R.id.temperaturemin)).setText(WeatherWrapper.getTemperatureMin(mDate));
+        ((TextView)findViewById(R.id.rain)).setText(WeatherWrapper.getRain(mDate));
+        ((TextView)findViewById(R.id.winddirection)).setText(WeatherWrapper.getWindDirection(mDate));
+        ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed(mDate));
 
         GridView gridview = (GridView)findViewById(R.id.dayactivitylist);
         activityAdapter = new ActivityAdapter(gridview.getContext(), mActivities);
         gridview.setAdapter(activityAdapter);
-    }
-
-    public DayView(Context context) {
-        this(context, null, null);
     }
 
     @Override

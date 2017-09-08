@@ -35,9 +35,11 @@ import java.util.Locale;
 
 public class WeatherWrapper extends ResultReceiver {
     private OnCompletionListener mOnCompletionListener;
+    private final static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
 
     public static JSONObject today = null;
     public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
+    public static boolean useMetric = WeatherIntentService.useMetric;
 
     private WeatherWrapper(Handler handler, OnCompletionListener completionListener) {
         super(handler);
@@ -66,14 +68,7 @@ public class WeatherWrapper extends ResultReceiver {
                     if (apiResult.has("forecasts")) {
                         forecasts.clear();
 
-                        SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
-                        Calendar calStart = new GregorianCalendar();
-                        calStart.setTime(new Date());
-                        calStart.set(Calendar.HOUR_OF_DAY, 0);
-                        calStart.set(Calendar.MINUTE, 0);
-                        calStart.set(Calendar.SECOND, 0);
-                        calStart.set(Calendar.MILLISECOND, 0);
-                        Date midnight = calStart.getTime();
+                        Date midnight = DateHelper.getMidnight(new Date());
                         JSONArray apiArray = (JSONArray)apiResult.get("forecasts");
                         for (int i = 0; i < apiArray.length(); i++) {
                             JSONObject forecast = (JSONObject)apiArray.get(i);
@@ -84,7 +79,7 @@ public class WeatherWrapper extends ResultReceiver {
                             }
                         }
                     } else if (apiResult.has("observation")) {
-                        today = (JSONObject) apiResult.get("observation");
+                        today = (JSONObject)apiResult.get("observation");
                     } else {
                         // Not supported; not implemented.
                     }
@@ -99,6 +94,8 @@ public class WeatherWrapper extends ResultReceiver {
         } else {
             Log.d("WW", "Error: " + resultCode);
         }
+
+        useMetric = resultData.getBoolean("usemetric");
 
         if (mOnCompletionListener != null && resultCode == WeatherIntentService.SUCCESS) {
             mOnCompletionListener.onCompletion();
@@ -128,47 +125,119 @@ public class WeatherWrapper extends ResultReceiver {
         return (today == null ? 0 : 1) + forecasts.size();
     }
 
-    public static String getRain() {
-        JSONObject forecast = getForecast();
+    private static JSONObject getObjectForDate(Date date) {
+        Date dateToday = DateHelper.getMidnight(new Date());
 
-        if (forecast == null) {
+        date = DateHelper.getMidnight(date);
+
+        if (dateToday.equals(date)) {
+            return today;
+        }
+
+        for (JSONObject forecast : forecasts) {
+            try {
+                if (forecast.has("fcst_valid_local") && date.equals(dateParser.parse(forecast.getString("fcst_valid_local")))) {
+                    return forecast;
+                }
+            } catch (ParseException e) {
+                // Ignore. Should have been caught earlier!
+            } catch (JSONException e) {
+                // Ignore. Should have been caught earlier!
+            }
+        }
+
+        return null;
+    }
+
+    private static String getPrecipitationUnit() {
+        if (useMetric) {
+            return "mm";
+        } else {
+            return "\"";
+        }
+    }
+
+    private static String getTemperatureUnit() {
+        if (useMetric) {
+            return "°C";
+        } else {
+            return "°F";
+        }
+    }
+
+    public static String getRain(Date date) {
+        JSONObject object = getObjectForDate(date);
+
+        if (object == null) {
             return "";
         }
 
-        return "12mm";
+        try {
+            if (object.has("qpf")) {
+                return object.getString("qpf") + getPrecipitationUnit();
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return "-";
     }
 
-    public static String getTemperature() {
-        JSONObject forecast = getForecast();
+    public static String getTemperature(Date date) {
+        JSONObject object = getObjectForDate(date);
 
-        if (forecast == null) {
+        if (object == null) {
             return "";
         }
 
-        return "12°C";
+        try {
+            if (object.has("temp")) {
+                return object.getString("temp") + getTemperatureUnit();
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return "-";
     }
 
-    public static String getTemperatureMin() {
-        JSONObject forecast = getForecast();
+    public static String getTemperatureMin(Date date) {
+        JSONObject object = getObjectForDate(date);
 
-        if (forecast == null) {
+        if (object == null) {
             return "";
         }
 
-        return "12°C";
+        try {
+            if (object.has("min_temp")) {
+                return object.getString("min_temp") + getTemperatureUnit();
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return "-";
     }
 
-    public static String getTemperatureMax() {
-        JSONObject forecast = getForecast();
+    public static String getTemperatureMax(Date date) {
+        JSONObject object = getObjectForDate(date);
 
-        if (forecast == null) {
+        if (object == null) {
             return "";
         }
 
-        return "12°C";
+        try {
+            if (object.has("max_temp")) {
+                return object.getString("max_temp") + getTemperatureUnit();
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return "-";
     }
 
-    public static String getWindDirection() {
+    public static String getWindDirection(Date date) {
         JSONObject forecast = getForecast();
 
         if (forecast == null) {
@@ -178,7 +247,7 @@ public class WeatherWrapper extends ResultReceiver {
         return "NW";
     }
 
-    public static String getWindSpeed() {
+    public static String getWindSpeed(Date date) {
         JSONObject forecast = getForecast();
 
         if (forecast == null) {

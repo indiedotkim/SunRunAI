@@ -1,6 +1,7 @@
 package com.burntrac.sunrunai;
 
 import java.util.Calendar;
+import java.util.ConcurrentModificationException;
 import java.util.TimeZone;
 
 import android.Manifest;
@@ -243,11 +244,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         //mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 1000, mLocationListener);
-
-        Location location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (location != null) {
-            Log.d(CONTEXT, location.toString());
-        }
     }
 
     @Override
@@ -262,20 +258,28 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     }
 
     public synchronized void onDataAdded(String collectionName, String documentID, String newValuesJson) {
-        synchronized (MeteorWrapper.meteor) {
-            // parse the JSON and manage the data yourself (not recommended)
-            // or
-            // enable a database (see section "Using databases to manage data") (recommended)
-            Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
-            Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
-            Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
-            Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
+        int retries = 100;
 
-            if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
-                Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
-                Log.d(CONTEXT, "x");
+        do {
+            try {
+                // parse the JSON and manage the data yourself (not recommended)
+                // or
+                // enable a database (see section "Using databases to manage data") (recommended)
+                Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
+                Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
+                Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
+                Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
+
+                if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
+                    Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
+                    Log.d(CONTEXT, "x");
+                }
+
+                retries = 0;
+            } catch (ConcurrentModificationException cme) {
+                retries--;
             }
-        }
+        } while (retries > 0);
 
         dayAdapter.notifyDataSetChanged();
     }
