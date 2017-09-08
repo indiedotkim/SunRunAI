@@ -18,21 +18,35 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by kim on 8/29/17.
  */
 
 public class WeatherWrapper extends ResultReceiver {
+    private OnCompletionListener mOnCompletionListener;
 
     public static JSONObject today = null;
     public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
 
-    private WeatherWrapper(Handler handler) {
+    private WeatherWrapper(Handler handler, OnCompletionListener completionListener) {
         super(handler);
+
+        mOnCompletionListener = completionListener;
+    }
+
+    private WeatherWrapper(Handler handler) {
+        this(handler, null);
     }
 
     @Override
@@ -52,16 +66,33 @@ public class WeatherWrapper extends ResultReceiver {
                     if (apiResult.has("forecasts")) {
                         forecasts.clear();
 
+                        SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
+                        Calendar calStart = new GregorianCalendar();
+                        calStart.setTime(new Date());
+                        calStart.set(Calendar.HOUR_OF_DAY, 0);
+                        calStart.set(Calendar.MINUTE, 0);
+                        calStart.set(Calendar.SECOND, 0);
+                        calStart.set(Calendar.MILLISECOND, 0);
+                        Date midnight = calStart.getTime();
                         JSONArray apiArray = (JSONArray)apiResult.get("forecasts");
                         for (int i = 0; i < apiArray.length(); i++) {
-                            forecasts.add((JSONObject) apiArray.get(i));
+                            JSONObject forecast = (JSONObject)apiArray.get(i);
+
+                            // Do not include "today":
+                            if (forecast.has("fcst_valid_local") && !midnight.equals(dateParser.parse((String)forecast.get("fcst_valid_local")))) {
+                                forecasts.add(forecast);
+                            }
                         }
                     } else if (apiResult.has("observation")) {
                         today = (JSONObject) apiResult.get("observation");
                     } else {
                         // Not supported; not implemented.
                     }
-                } catch (JSONException je) {
+                }
+                catch (JSONException je) {
+
+                }
+                catch (ParseException pe) {
 
                 }
             }
@@ -69,7 +100,9 @@ public class WeatherWrapper extends ResultReceiver {
             Log.d("WW", "Error: " + resultCode);
         }
 
-        Log.d("WW", "Done.");
+        if (mOnCompletionListener != null && resultCode == WeatherIntentService.SUCCESS) {
+            mOnCompletionListener.onCompletion();
+        }
     }
 
     private static JSONObject getForecast() {
@@ -82,13 +115,17 @@ public class WeatherWrapper extends ResultReceiver {
         return forecast;
     }
 
-    public static void update(Context context) {
-        WeatherWrapper receiver = new WeatherWrapper(new Handler());
+    public static void update(Context context, OnCompletionListener completionListener) {
+        WeatherWrapper receiver = new WeatherWrapper(new Handler(), completionListener);
 
         Intent intent = new Intent(context, WeatherIntentService.class);
         intent.putExtra("receiver", receiver);
 
         context.startService(intent);
+    }
+
+    public static int getDaysWithDataAvailable() {
+        return (today == null ? 0 : 1) + forecasts.size();
     }
 
     public static String getRain() {

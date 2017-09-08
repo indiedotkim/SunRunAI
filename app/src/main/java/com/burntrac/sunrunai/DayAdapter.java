@@ -32,12 +32,18 @@ public class DayAdapter extends BaseAdapter {
 
             return 0;
         }
-return 1;
+
+        // Determine max of:
+        // - number of weather-data days, if no activities are present, or,
+        // - number of activity days
+
         /*
         Collection collection = MeteorWrapper.meteor.getDatabase().getCollection("activity");
 
         return collection == null ? 0 : collection.count();
         */
+
+        return WeatherWrapper.getDaysWithDataAvailable();
     }
 
     public Object getItem(int position) {

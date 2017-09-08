@@ -31,8 +31,7 @@ import im.delight.android.ddp.Meteor;
 import im.delight.android.ddp.MeteorCallback;
 import im.delight.android.ddp.ResultListener;
 
-public class MainActivity extends AppCompatActivity implements MeteorCallback, ActivityCompat.OnRequestPermissionsResultCallback {
-
+public class MainActivity extends AppCompatActivity implements MeteorCallback, ActivityCompat.OnRequestPermissionsResultCallback, OnCompletionListener {
     private final static String CONTEXT = "MainActivity";
 
     private LocationManager mLocationManager;
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
                 WeatherIntentService.location = location;
 
-                WeatherWrapper.update(self.getApplicationContext());
+                WeatherWrapper.update(self.getApplicationContext(), self);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -293,5 +292,10 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         // or
         // enable a database (see section "Using databases to manage data") (recommended)
         Log.d(CONTEXT, "Removed: " + collectionName + ", " + documentID);
+    }
+
+    @Override
+    public void onCompletion() {
+        dayAdapter.notifyDataSetChanged();
     }
 }
