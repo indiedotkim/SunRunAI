@@ -62,13 +62,13 @@ public class DayAdapter extends BaseAdapter {
         Date date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
 
         if (convertView == null) {
-            view = new DayView(mContext, null, date, activities);
+            view = new DayView(mContext, null, position, date, activities);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
         } else {
             view = (DayView)convertView;
-            view.override(date, activities);
+            view.override(position, date, activities);
 
             mItems.put(position, view);
         }

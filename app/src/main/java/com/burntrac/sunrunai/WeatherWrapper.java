@@ -126,12 +126,17 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     private static JSONObject getObjectForDate(Date date) {
-        Date dateToday = DateHelper.getMidnight(new Date());
-
+        return getObjectForDate(date, false);
+    }
+    private static JSONObject getObjectForDate(Date date, boolean forceForecast) {
         date = DateHelper.getMidnight(date);
 
-        if (dateToday.equals(date)) {
-            return today;
+        if (!forceForecast) {
+            Date dateToday = DateHelper.getMidnight(new Date());
+
+            if (dateToday.equals(date)) {
+                return today;
+            }
         }
 
         for (JSONObject forecast : forecasts) {
@@ -191,8 +196,12 @@ public class WeatherWrapper extends ResultReceiver {
         }
 
         try {
-            if (object.has("temp")) {
-                return object.getString("temp") + getTemperatureUnit();
+            if (object.has("metric")) {
+                JSONObject metric = object.getJSONObject("metric");
+
+                if (metric.has("temp")) {
+                    return metric.getString("temp") + getTemperatureUnit();
+                }
             }
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
@@ -202,7 +211,7 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static String getTemperatureMin(Date date) {
-        JSONObject object = getObjectForDate(date);
+        JSONObject object = getObjectForDate(date, true);
 
         if (object == null) {
             return "";
@@ -220,7 +229,7 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static String getTemperatureMax(Date date) {
-        JSONObject object = getObjectForDate(date);
+        JSONObject object = getObjectForDate(date, true);
 
         if (object == null) {
             return "";

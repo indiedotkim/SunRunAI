@@ -56,7 +56,13 @@ public class DateHelper {
 
         calendar.setTime(date);
 
-        switch (calendar.get(Calendar.DAY_OF_MONTH) % 10) {
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        if (dayOfMonth >= 11 && dayOfMonth <= 13) {
+            return "th";
+        }
+
+        switch (dayOfMonth % 10) {
             case 1:
                 return "st";
             case 2:

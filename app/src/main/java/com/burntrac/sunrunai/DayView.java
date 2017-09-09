@@ -3,6 +3,7 @@ package com.burntrac.sunrunai;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import java.util.Date;
  */
 
 public class DayView extends LinearLayout {
+    private int mPosition;
     private Date mDate;
     private View mValue;
     private ImageView mImage;
@@ -28,9 +30,10 @@ public class DayView extends LinearLayout {
 
     private ActivityAdapter activityAdapter;
 
-    public DayView(Context context, AttributeSet attrs, Date date, ArrayList activities) {
+    public DayView(Context context, AttributeSet attrs, int position, Date date, ArrayList activities) {
         super(context, attrs);
 
+        mPosition = position;
         mDate = date;
         mActivities = activities;
 
@@ -64,11 +67,8 @@ public class DayView extends LinearLayout {
         setViewValues();
     }
 
-    public DayView(Context context) {
-        this(context, null, null, null);
-    }
-
-    public void override(Date date, ArrayList activities) {
+    public void override(int position, Date date, ArrayList activities) {
+        mPosition = position;
         mDate = date;
         mActivities = activities;
 
@@ -76,6 +76,14 @@ public class DayView extends LinearLayout {
     }
 
     private void setViewValues() {
+        /*
+        if ((mPosition % 2) == 0) {
+            this.setBackgroundColor(Color.rgb(0xd2, 0xe7, 0xff));
+        } else {
+            this.setBackgroundColor(Color.rgb(0xc2, 0xd7, 0xef));
+        }
+        */
+
         ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(mDate));
         ((TextView)findViewById(R.id.datesuffix)).setText(DateHelper.formatDateSuffix(mDate));
 
