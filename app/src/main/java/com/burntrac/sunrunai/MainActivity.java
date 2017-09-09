@@ -106,9 +106,15 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent i;
+
         switch (item.getItemId()) {
+            case R.id.plans:
+                i = new Intent(getApplicationContext(), PlanActivity.class);
+                startActivity(i);
+                return true;
             case R.id.settings:
-                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+                i = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(i);
                 return true;
             default:
