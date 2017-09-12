@@ -2,16 +2,12 @@ package com.burntrac.sunrunai;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,7 +24,7 @@ public class DayView extends LinearLayout {
     private ImageView mImage;
     private ArrayList mActivities;
 
-    private ActivityAdapter activityAdapter;
+    private ActivityAdapter mActivityAdapter;
 
     public DayView(Context context, AttributeSet attrs, int position, Date date, ArrayList activities) {
         super(context, attrs);
@@ -95,14 +91,14 @@ public class DayView extends LinearLayout {
         ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed(mDate));
 
         GridView gridview = (GridView)findViewById(R.id.dayactivitylist);
-        activityAdapter = new ActivityAdapter(gridview.getContext(), mActivities);
-        gridview.setAdapter(activityAdapter);
+        mActivityAdapter = new ActivityAdapter(gridview.getContext(), mActivities);
+        gridview.setAdapter(mActivityAdapter);
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
 
-        activityAdapter.notifyDataSetChanged();
+        mActivityAdapter.notifyDataSetChanged();
     }
 }

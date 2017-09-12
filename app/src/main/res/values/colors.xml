@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <!-- <color name="colorAccent">#FF4081</color> -->
     <color name="colorAccent">#23c5ca</color>
+    <color name="colorRunning">#80a3f7ff</color>
+    <color name="colorCycling">#a1ffdc</color>
+    <color name="colorGym">#e0ffa1</color>
+    <color name="colorYoga">#ffe9a1</color>
+    <color name="colorSwimming">#abc3ff</color>
 </resources>

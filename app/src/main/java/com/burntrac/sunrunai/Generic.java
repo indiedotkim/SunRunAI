@@ -7,6 +7,16 @@ package com.burntrac.sunrunai;
 public class Generic {
     public static final int MDIGITS = 2; // Mantissa digits.
 
+    public static final boolean hasValue(Integer integer) {
+        if (integer == null) {
+            return false;
+        } else if (integer != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static final boolean hasValue(String string) {
         if (string == null) {
             return false;

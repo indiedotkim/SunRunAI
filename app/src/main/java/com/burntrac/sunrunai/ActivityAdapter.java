@@ -42,16 +42,17 @@ public class ActivityAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityView view;
+        HashMap activity = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
 
         if (convertView == null) {
-            HashMap activity = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
-
-            view = new ActivityView(mContext, null, activity);
+            view = new ActivityView(mContext, null, position, activity);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, getListHeight()));
 
             mItems.put(position, view);
         } else {
             view = (ActivityView)convertView;
+
+            view.override(position, activity);
 
             mItems.put(position, view);
         }

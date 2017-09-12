@@ -1,33 +1,42 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * Created by kim on 9/2/17.
+ * Created by kim on 9/3/17.
  */
 
 public class ActivityDetailsAdapter extends BaseAdapter {
-    private Context mContext;
+    private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
-    public ActivityDetailsAdapter(Context context) {
+    private Context mContext;
+    private int mPosition;
+    private ArrayList mActivities;
+    private HashMap<Integer, ActivityDetailsView> mItems;
+
+    public ActivityDetailsAdapter(Context context, int position, ArrayList activities) {
         mContext = context;
+        mPosition = position;
+        mActivities = activities == null ? new ArrayList() : activities;
+        mItems = new HashMap<Integer, ActivityDetailsView>();
     }
 
     @Override
     public int getCount() {
-        return 4;
+        return mActivities.size();
     }
 
     @Override
-    public Object getItem(int i) {
-        return null;
+    public Object getItem(int position) {
+        return mItems.get(position);
     }
 
     @Override
@@ -38,16 +47,46 @@ public class ActivityDetailsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityDetailsView view;
+        HashMap details = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
 
         if (convertView == null) {
-            view = new ActivityDetailsView(mContext);
-            view.setLayoutParams(new ListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            view = new ActivityDetailsView(mContext, null, position, details);
+            view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            mItems.put(position, view);
         } else {
             view = (ActivityDetailsView)convertView;
+
+            view.override(position, details);
+
+            mItems.put(position, view);
         }
 
         //view.setText(texts[position]);
 
         return view;
+    }
+
+    public int getMeasuredHeight() {
+        int height = 0;
+
+        for (int position = 0; position < getCount(); position++) {
+            View view = getView(position, null, null);
+
+            view.measure(UNBOUNDED, UNBOUNDED);
+
+            height += view.getMeasuredHeight();
+        }
+
+        return height;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        for (ActivityDetailsView view : mItems.values()) {
+            view.invalidate();
+        }
     }
 }
