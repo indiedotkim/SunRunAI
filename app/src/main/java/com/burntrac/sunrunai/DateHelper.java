@@ -28,6 +28,9 @@ public class DateHelper {
     public static Date getNextDay(Date date) {
         return getNDaysAhead(date, 1);
     }
+    public static Date getPreviousDay(Date date) {
+        return getNDaysAhead(date, -1);
+    }
 
     public static Date getNDaysAhead(Date date, int n) {
         if (n == 0) {

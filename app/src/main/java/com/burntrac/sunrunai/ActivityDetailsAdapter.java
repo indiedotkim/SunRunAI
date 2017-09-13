@@ -1,13 +1,13 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -21,12 +21,14 @@ public class ActivityDetailsAdapter extends BaseAdapter {
     private int mPosition;
     private ArrayList mActivities;
     private HashMap<Integer, ActivityDetailsView> mItems;
+    private Date mPlanStart;
 
-    public ActivityDetailsAdapter(Context context, int position, ArrayList activities) {
+    public ActivityDetailsAdapter(Context context, int position, ArrayList activities, Date planstart) {
         mContext = context;
         mPosition = position;
         mActivities = activities == null ? new ArrayList() : activities;
         mItems = new HashMap<Integer, ActivityDetailsView>();
+        mPlanStart = planstart;
     }
 
     @Override
@@ -50,14 +52,14 @@ public class ActivityDetailsAdapter extends BaseAdapter {
         HashMap details = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
 
         if (convertView == null) {
-            view = new ActivityDetailsView(mContext, null, position, details);
+            view = new ActivityDetailsView(mContext, null, position, details, mPlanStart);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
         } else {
             view = (ActivityDetailsView)convertView;
 
-            view.override(position, details);
+            view.override(position, details, mPlanStart);
 
             mItems.put(position, view);
         }

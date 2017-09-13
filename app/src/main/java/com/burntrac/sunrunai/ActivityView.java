@@ -41,7 +41,7 @@ public class ActivityView extends LinearLayout {
         setActivity(context);
 
         ListView listview = (ListView)findViewById(R.id.activitydetailsview);
-        mActivityDetailsAdapter = new ActivityDetailsAdapter(context, mPosition, details);
+        mActivityDetailsAdapter = new ActivityDetailsAdapter(context, mPosition, details, null);
         listview.setAdapter(mActivityDetailsAdapter);
     }
 

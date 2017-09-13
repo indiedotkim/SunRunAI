@@ -4,46 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="76dp"
     android:layout_height="wrap_content"
-    android:background="@color/colorRunning"
+    android:background="?android:attr/detailsElementBackground"
     android:orientation="vertical"
-    android:paddingBottom="4dp"
+    android:paddingBottom="8dp"
     android:paddingTop="6dp">
 
     <ImageView
         android:id="@+id/activityicon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="48dp"
-        android:alpha="0.2"
+        android:layout_marginTop="68dp"
+        android:alpha="1"
+        android:foregroundTintMode="add"
         android:scaleX="2"
         android:scaleY="2"
+        android:tint="@color/colorRunning"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_sport_icon_59" />
+        app:srcCompat="@drawable/bt_activity_icon_running" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weeklabel">
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:text="Sep, 25"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dateordinal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0dp"
+            android:text="th"
+            android:textSize="8sp"
+            android:textStyle="italic"
+            app:layout_constraintLeft_toRightOf="@+id/date"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/date" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/time"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="0:00:00"
         android:textAlignment="center"
+        android:textColor="@android:color/black"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@+id/weeklabel"
-        app:layout_constraintTop_toBottomOf="@+id/weeklabel" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="8dp"
         android:text="42.2km"
         android:textAlignment="center"
+        android:textColor="@android:color/black"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@+id/time"
         app:layout_constraintTop_toBottomOf="@+id/time" />
@@ -53,17 +93,18 @@
         android:layout_width="26dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:text="42"
         android:textAlignment="center"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_editor_absoluteY="8dp" />
 
     <TextView
-        android:id="@+id/day"
+        android:id="@+id/startday"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="8dp"
         android:text="7"
         android:textAlignment="center"
         app:layout_constraintLeft_toRightOf="@+id/week"
@@ -73,8 +114,6 @@
         android:id="@+id/weeklabel"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="0dp"
         android:text="Week"
         android:textAlignment="center"
         android:textSize="10sp"
@@ -85,19 +124,16 @@
         android:id="@+id/daylabel"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="0dp"
         android:text="Day"
         android:textAlignment="center"
         android:textSize="10sp"
-        app:layout_constraintLeft_toLeftOf="@+id/day"
-        app:layout_constraintTop_toBottomOf="@+id/day" />
+        app:layout_constraintLeft_toLeftOf="@+id/startday"
+        app:layout_constraintTop_toBottomOf="@+id/startday" />
 
     <TextView
         android:id="@+id/tags"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="8dp"
         android:text="tags"
         android:textAlignment="center"

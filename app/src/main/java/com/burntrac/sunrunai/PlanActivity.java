@@ -43,11 +43,13 @@ public class PlanActivity extends AppCompatActivity {
                 builder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 builder.setPositiveButton("Select", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
                     }
                 });
                 AlertDialog dialog = builder.create();
