@@ -1,5 +1,6 @@
 package com.burntrac.sunrunai;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,6 +12,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kim on 9/2/17.
@@ -28,33 +31,56 @@ public class ActivityHelper extends SQLiteOpenHelper {
 
     private static int debug = 0;
 
-    public static HashMap createActivity() {
-        HashMap activity = new HashMap();
-
-        activity.put("name", "Name " + debug);
-        activity.put("comments", new ArrayList());
-        activity.put("datetime", new Date().getTime() + debug * 24 * 60 * 60 * 1000);
-        activity.put("deleted", false);
-        activity.put("kind", 4);
-        activity.put("schedule", 0);
-
+    public static ArrayList createActivityDetails(List[] comments,
+                                                  int hours,
+                                                  int minutes,
+                                                  int seconds,
+                                                  int kind,
+                                                  float distance,
+                                                  int distancetype) {
         ArrayList details = new ArrayList();
 
         HashMap detail = new HashMap();
-        detail.put("comments", new ArrayList());
 
-        detail.put("hours", 0);
-        detail.put("minutes", 30);
-        detail.put("seconds", 10);
+        detail.put("comments", comments == null ? new ArrayList() : comments);
 
-        detail.put("kind", 4);
-        detail.put("distance", 10);
-        detail.put("distancetype", 2);
+        detail.put("hours", hours);
+        detail.put("minutes", minutes);
+        detail.put("seconds", seconds);
+
+        detail.put("kind", kind);
+        detail.put("distance", distance);
+        detail.put("distancetype", distancetype);
 
         detail.put("gear", null);
         detail.put("injury", null);
 
+        details.add(detail);
+
+        return details;
+    }
+
+    public static JSONObject createActivity(String name,
+                                     List[] comments,
+                                     Date datetime,
+                                     int schedule,
+                                     List details) {
+        HashMap activity = new HashMap();
+
+        activity.put("name", name + Math.abs(new java.util.Random().nextInt()));
+        activity.put("comments", comments == null ? new ArrayList() : comments);
+        activity.put("datetime", datetime.getTime());
+        activity.put("deleted", false);
+        activity.put("schedule", schedule);
+
         activity.put("details", details);
+
+        return new JSONObject(activity);
+    }
+
+    public static JSONObject createActivity() {
+        List details = createActivityDetails(null, 1, 0, 0, 4, 10, 2);
+        JSONObject activity = createActivity("Test", null, new Date(), 0, details);
 
         return activity;
     }
@@ -74,16 +100,26 @@ public class ActivityHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<JSONObject> getActivities() {
+        return getActivities(null, null);
+    }
+
+    public synchronized ArrayList<JSONObject> getActivities(Date from, Date to) {
         ArrayList<JSONObject> activities = new ArrayList<JSONObject>();
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + ";", null);
+        Cursor cursor;
+
+        if (from != null && to != null) {
+            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE datetime >= " + from.getTime() + " AND datetime < " + to.getTime() + " ORDER BY datetime ASC;", null);
+        } else {
+            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " ORDER BY datetime ASC;", null);
+        }
 
         if (cursor.getCount() == 0) {
             return activities;
         }
 
-        do {
+        while (cursor.moveToNext()) {
             String jsonString = cursor.getString(0);
 
             try {
@@ -94,8 +130,24 @@ public class ActivityHelper extends SQLiteOpenHelper {
             catch(JSONException je) {
                 // TODO Report corrupt database.
             }
-        } while(cursor.moveToNext());
+        };
 
         return activities;
+    }
+
+    public synchronized long addActivity(Map activity) {
+        JSONObject object = new JSONObject(activity);
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues content = new ContentValues();
+
+        content.put("datetime", (long)activity.get("datetime"));
+        content.put("json", object.toString());
+
+        long result = db.insert(TABLE_NAME, null, content);
+        int x = 5;
+
+        return result;
     }
 }

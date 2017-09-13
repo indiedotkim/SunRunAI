@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
 
-    private ActivityHelper mActivityHelper;
-    private DayAdapter dayAdapter;
+    public ActivityHelper mActivityHelper;
+    private DayAdapter mDayAdapter;
 
     private String activityId;
     private String activityPlanId;
@@ -52,11 +52,12 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         setContentView(R.layout.activity_main);
 
         mActivityHelper = new ActivityHelper(getApplicationContext());
-        mActivityHelper.getActivities();
+
+        //mActivityHelper.addActivity(ActivityHelper.createActivity());
 
         GridView gridview = (GridView) findViewById(R.id.daygridview);
-        dayAdapter = new DayAdapter(gridview.getContext());
-        gridview.setAdapter(dayAdapter);
+        mDayAdapter = new DayAdapter(this, gridview.getContext());
+        gridview.setAdapter(mDayAdapter);
 
         //meteor = new Meteor(this, "wss://www.burntrac.com/websocket");
         MeteorWrapper.meteor = new Meteor(this, "ws://192.168.1.106:3000/websocket", new InMemoryDatabase());
@@ -249,7 +250,9 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         }
 
         //mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 1000, mLocationListener);
+
+        //mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 1000, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 1000, 1000, mLocationListener);
     }
 
     @Override
@@ -287,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             }
         } while (retries > 0);
 
-        dayAdapter.notifyDataSetChanged();
+        mDayAdapter.notifyDataSetChanged();
     }
 
     public synchronized void onDataChanged(String collectionName, String documentID, String updatedValuesJson, String removedValuesJson) {
@@ -306,6 +309,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
     @Override
     public void onCompletion() {
-        dayAdapter.notifyDataSetChanged();
+        mDayAdapter.notifyDataSetChanged();
     }
 }

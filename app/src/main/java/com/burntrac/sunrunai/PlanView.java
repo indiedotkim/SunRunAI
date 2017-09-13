@@ -1,6 +1,8 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,9 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,6 +89,7 @@ public class PlanView extends LinearLayout {
     private void setViewValues() {
         setViewValues(false);
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void setViewValues(boolean updateDateOnly) {
         if (mPlan == null) {
             return;
@@ -106,7 +112,13 @@ public class PlanView extends LinearLayout {
             }
 
             GridView view = (GridView)findViewById(R.id.planactivitylist);
-            mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, (ArrayList) mPlan.getField("details"), mDate);
+            JSONArray details = null;
+            try {
+                details = new JSONArray(mPlan.getField("details"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, mDate);
             view.setAdapter(mActivityDetailsAdapter);
         }
 

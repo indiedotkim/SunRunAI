@@ -6,6 +6,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,21 +23,21 @@ public class ActivityDetailsAdapter extends BaseAdapter {
 
     private Context mContext;
     private int mPosition;
-    private ArrayList mActivities;
+    private JSONArray mActivities;
     private HashMap<Integer, ActivityDetailsView> mItems;
     private Date mPlanStart;
 
-    public ActivityDetailsAdapter(Context context, int position, ArrayList activities, Date planstart) {
+    public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart) {
         mContext = context;
         mPosition = position;
-        mActivities = activities == null ? new ArrayList() : activities;
+        mActivities = activities == null ? new JSONArray() : activities;
         mItems = new HashMap<Integer, ActivityDetailsView>();
         mPlanStart = planstart;
     }
 
     @Override
     public int getCount() {
-        return mActivities.size();
+        return mActivities.length();
     }
 
     @Override
@@ -49,7 +53,12 @@ public class ActivityDetailsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityDetailsView view;
-        HashMap details = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
+        JSONObject details = null;
+        try {
+            details = mActivities.length() > position ? mActivities.getJSONObject(position) : null;
+        } catch (JSONException e) {
+            details = null;
+        }
 
         if (convertView == null) {
             view = new ActivityDetailsView(mContext, null, position, details, mPlanStart);

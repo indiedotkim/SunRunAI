@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,10 +26,10 @@ public class ActivityDetailsView extends LinearLayout {
     private ImageView mImage;
 
     private int mPosition;
-    private HashMap mActivity;
+    private JSONObject mActivity;
     private Date mPlanStart;
 
-    public ActivityDetailsView(Context context, AttributeSet attrs, int position, HashMap activity, Date planstart) {
+    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activity, Date planstart) {
         super(context, attrs);
 
         mPosition = position;
@@ -40,7 +43,7 @@ public class ActivityDetailsView extends LinearLayout {
         setViewValues();
     }
 
-    public void override(int position, HashMap activity, Date planstart) {
+    public void override(int position, JSONObject activity, Date planstart) {
         mPosition = position;
         mActivity = activity;
         mPlanStart = planstart;
@@ -55,7 +58,12 @@ public class ActivityDetailsView extends LinearLayout {
             return;
         }
 
-        String cssIcon = (String)MeteorWrapper.findKVMatch("activitytypes", "activityno", mActivity.get("kind"), "icon");
+        String cssIcon = null;
+        try {
+            cssIcon = (String) MeteorWrapper.findKVMatch("activitytypes", "activityno", mActivity.getInt("kind"), "icon");
+        } catch (JSONException e) {
+            // No problem.
+        }
         ImageView icon = (ImageView)findViewById(R.id.activityicon);
         if (cssIcon != null) {
             String iconName = ResourceResolver.getIconFromClasses(cssIcon);
@@ -66,22 +74,34 @@ public class ActivityDetailsView extends LinearLayout {
         TextView day = (TextView)findViewById(R.id.startday);
 
         if (week != null) {
-            String weekValue = Generic.hasValue((Integer)mActivity.get("week")) ? "" + (Integer)mActivity.get("week") : "-";
-            week.setText(weekValue);
+            try {
+                String weekValue = Generic.hasValue(mActivity.getInt("week")) ? "" + mActivity.getInt("week") : "-";
+                week.setText(weekValue);
+            } catch (JSONException e) {
+                // No problem.
+            }
         }
         if (day != null) {
-            String dayValue = Generic.hasValue((Integer)mActivity.get("day")) ? "" + (Integer)mActivity.get("day") : "-";
-            day.setText(dayValue);
+            try {
+                String dayValue = Generic.hasValue(mActivity.getInt("day")) ? "" + mActivity.getInt("day") : "-";
+                day.setText(dayValue);
+            } catch (JSONException e) {
+                // No problem.
+            }
         }
 
         if (mPlanStart != null && week != null && day != null) {
-            int weekNo = Generic.hasValue((Integer)mActivity.get("week")) ? (Integer)mActivity.get("week") : 1;
-            int dayNo = Generic.hasValue((Integer)mActivity.get("day")) ? (Integer)mActivity.get("day") : 1;
+            try {
+                int weekNo = Generic.hasValue(mActivity.getInt("week")) ? mActivity.getInt("week") : 1;
+                int dayNo = Generic.hasValue(mActivity.getInt("day")) ? mActivity.getInt("day") : 1;
 
-            Date activityDate = DateHelper.getNDaysAhead(mPlanStart, (weekNo - 1) * 8 + dayNo - 1);
+                Date activityDate = DateHelper.getNDaysAhead(mPlanStart, (weekNo - 1) * 8 + dayNo - 1);
 
-            ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
-            ((TextView)findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+                ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
+                ((TextView)findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+            } catch (JSONException e) {
+                // No problem.
+            }
         }
         //String name = Generic.hasValue((String)mActivity.get("name")) ? (String)mActivity.get("name") : "-";
         //((TextView)findViewById(R.id.activityname)).setText(name);

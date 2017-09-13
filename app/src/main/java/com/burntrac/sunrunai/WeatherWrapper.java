@@ -125,6 +125,10 @@ public class WeatherWrapper extends ResultReceiver {
         return (today == null ? 0 : 1) + forecasts.size();
     }
 
+    public static boolean hasDataForDay(Date date) {
+        return getObjectForDate(date, false) != null;
+    }
+
     private static JSONObject getObjectForDate(Date date) {
         return getObjectForDate(date, false);
     }

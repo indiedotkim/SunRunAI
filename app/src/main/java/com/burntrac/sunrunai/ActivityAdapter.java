@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,7 +17,7 @@ import java.util.HashMap;
 
 public class ActivityAdapter extends BaseAdapter {
     private Context mContext;
-    private ArrayList mActivities;
+    private ArrayList<JSONObject> mActivities;
     private HashMap<Integer, ActivityView> mItems;
 
     public ActivityAdapter(Context context, ArrayList activities) {
@@ -42,7 +44,7 @@ public class ActivityAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityView view;
-        HashMap activity = mActivities.size() > position ? (HashMap)mActivities.get(position) : null;
+        JSONObject activity = mActivities.size() > position ? mActivities.get(position) : null;
 
         if (convertView == null) {
             view = new ActivityView(mContext, null, position, activity);
