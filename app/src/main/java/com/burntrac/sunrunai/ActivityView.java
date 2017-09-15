@@ -61,7 +61,11 @@ public class ActivityView extends LinearLayout {
 
     private void setActivity(Context context) {
         if (mActivity == null) {
-            ((TextView)findViewById(R.id.activityname)).setText("IS NULL");
+            ((TextView)findViewById(R.id.activityname)).setText("Rest");
+
+            ImageView icon = (ImageView)findViewById(R.id.activityicon);
+            String iconName = ResourceResolver.getIconFromClasses("bt-activity-icon-rest");
+            icon.setImageResource(ResourceResolver.getIdentifierForDrawable(icon.getContext(), iconName));
 
             return;
         }
@@ -73,7 +77,7 @@ public class ActivityView extends LinearLayout {
             name = "-";
         }
 
-        ((TextView)findViewById(R.id.activityname)).setText(name);
+        ((TextView)findViewById(R.id.activityname)).setText(name + "UU");
 
     }
     @Override

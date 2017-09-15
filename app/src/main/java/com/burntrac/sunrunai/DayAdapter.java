@@ -54,13 +54,13 @@ public class DayAdapter extends BaseAdapter {
         return collection == null ? 0 : collection.count();
         */
 
-        ArrayList<JSONObject> activities = mMain.mActivityHelper.getActivities();
+        ArrayList<JSONObject> activities = MainActivity.sActivityHelper.getActivities();
 
         Date today = DateHelper.getMidnight(new Date());
         Date today10 = DateHelper.getMidnight(DateHelper.getNDaysAhead(new Date(), 11));
 
         // new Date(activities.get(0).getLong("datetime"))
-        if (activities != null) {
+        if (activities != null && activities.size() > 0) {
             try {
                 Date start = DateHelper.getMidnight(new Date(activities.get(0).getLong("datetime")));
                 Date end = DateHelper.getMidnight(new Date(activities.get(activities.size() - 1).getLong("datetime")));
@@ -108,7 +108,10 @@ public class DayAdapter extends BaseAdapter {
         ArrayList activities;
 
         if (mStart != null && mEnd != null) {
-            activities = mMain.mActivityHelper.getActivities(mStart, mEnd);
+            Date viewStart = DateHelper.getNDaysAhead(mStart, position);
+            Date viewEnd = DateHelper.getNDaysAhead(mStart, position + 1);
+
+            activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd);
         } else {
             activities = new ArrayList();
             activities.add(ActivityHelper.createActivity());

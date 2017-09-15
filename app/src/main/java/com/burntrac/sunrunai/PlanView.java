@@ -21,6 +21,7 @@ import org.json.JSONException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -113,11 +114,7 @@ public class PlanView extends LinearLayout {
 
             GridView view = (GridView)findViewById(R.id.planactivitylist);
             JSONArray details = null;
-            try {
-                details = new JSONArray(mPlan.getField("details"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            details = new JSONArray((Collection)mPlan.getField("details"));
             mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, mDate);
             view.setAdapter(mActivityDetailsAdapter);
         }
@@ -127,6 +124,10 @@ public class PlanView extends LinearLayout {
 
     public Document getPlan() {
         return mPlan;
+    }
+
+    public Date getStartDate() {
+        return mDate;
     }
 
     public int getCalculatedHeight() {

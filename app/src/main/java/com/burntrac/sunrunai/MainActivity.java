@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
 
-    public ActivityHelper mActivityHelper;
+    public static ActivityHelper sActivityHelper;
     private DayAdapter mDayAdapter;
 
     private String activityId;
@@ -51,7 +51,13 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mActivityHelper = new ActivityHelper(getApplicationContext());
+        synchronized (CONTEXT) {
+            if (sActivityHelper == null) {
+                sActivityHelper = new ActivityHelper(getApplicationContext());
+
+                //sActivityHelper.deleteScheduledActivities();
+            }
+        }
 
         //mActivityHelper.addActivity(ActivityHelper.createActivity());
 
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         switch (item.getItemId()) {
             case R.id.plans:
                 i = new Intent(getApplicationContext(), PlanActivity.class);
-                startActivity(i);
+                startActivityForResult(i, Generic.STATUS_PLAN_ADDED);
                 return true;
             case R.id.settings:
                 i = new Intent(getApplicationContext(), SettingsActivity.class);
@@ -309,6 +315,11 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
     @Override
     public void onCompletion() {
+        mDayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mDayAdapter.notifyDataSetChanged();
     }
 }

@@ -4,9 +4,12 @@
     <color name="colorPrimaryDark">#303f9f</color>
     <!-- <color name="colorAccent">#FF4081</color> -->
     <color name="colorAccent">#23c5ca</color>
-    <color name="colorRunning">#a3f7ff</color>
+    <color name="colorRunning">#45efff</color>
     <color name="colorCycling">#a1ffdc</color>
     <color name="colorGym">#e0ffa1</color>
     <color name="colorYoga">#ffe9a1</color>
     <color name="colorSwimming">#abc3ff</color>
+    <!-- *** -->
+    <color name="colorCardPlanned">#eeeeee</color>
+    <color name="colorCardWorkout">#ffe9a1</color>
 </resources>

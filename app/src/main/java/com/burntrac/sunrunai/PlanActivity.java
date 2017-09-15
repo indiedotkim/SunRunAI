@@ -2,6 +2,7 @@ package com.burntrac.sunrunai;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import im.delight.android.ddp.db.Document;
 
 public class PlanActivity extends AppCompatActivity {
 
@@ -35,23 +43,49 @@ public class PlanActivity extends AppCompatActivity {
         final Context self = this;
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView parentView, View childView, int position, long id) {
+            public void onItemClick(AdapterView parentView, final View childView, int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(self);
 
-                View view = new PlanView(self, null, -1, ((PlanView)childView).getPlan());
+                final Document plan = ((PlanView)childView).getPlan();
+                View view = new PlanView(self, null, -1, plan);
                 builder.setView(view);
+
                 builder.setNegativeButton("Back", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                     }
                 });
+
                 builder.setPositiveButton("Select", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Date planStart = ((PlanView)childView).getStartDate();
+
+                        for (Object object : (ArrayList)plan.getField("details")) {
+                            LinkedHashMap details = (LinkedHashMap)object;
+                            HashMap activity = new HashMap();
+
+                            activity.put("name", "");
+                            activity.put("comments", new ArrayList());
+
+                            Date activityDate = DateHelper.getNDaysAhead(planStart, ((int)details.get("week") - 1) * 8 + (int)details.get("day") - 1);
+                            activity.put("datetime", activityDate.getTime());
+
+                            activity.put("deleted", false);
+                            activity.put("schedule", Generic.SCHEDULE_PLANNED);
+
+                            activity.put("details", details);
+
+                            MainActivity.sActivityHelper.addActivity(activity);
+                        }
+
+
+                        setResult(Generic.STATUS_PLAN_ADDED);
                         finish();
                     }
                 });
+
                 AlertDialog dialog = builder.create();
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override

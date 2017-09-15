@@ -26,6 +26,7 @@ public class ActivityHelper extends SQLiteOpenHelper {
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     "datetime INTEGER, " +
+                    "schedule INTEGER, " +
                     "json TEXT" +
                     ");";
 
@@ -143,11 +144,23 @@ public class ActivityHelper extends SQLiteOpenHelper {
         ContentValues content = new ContentValues();
 
         content.put("datetime", (long)activity.get("datetime"));
+        content.put("schedule", (int)activity.get("schedule"));
         content.put("json", object.toString());
 
         long result = db.insert(TABLE_NAME, null, content);
-        int x = 5;
 
         return result;
+    }
+
+    public synchronized int deleteScheduledActivities() {
+        SQLiteDatabase db = getWritableDatabase();
+
+        return db.delete(TABLE_NAME, "schedule = 1", new String[] {});
+    }
+
+    public synchronized void dropActivities() {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.rawQuery("DROP TABLE " + TABLE_NAME, null);
     }
 }

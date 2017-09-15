@@ -5,6 +5,10 @@ package com.burntrac.sunrunai;
  */
 
 public class Generic {
+    public static final int SCHEDULE_PLANNED = 1;
+
+    public static final int STATUS_PLAN_ADDED = 1;
+
     public static final int MDIGITS = 2; // Mantissa digits.
 
     public static final boolean hasValue(Integer integer) {

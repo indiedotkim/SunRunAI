@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,21 +54,43 @@ public class ActivityDetailsView extends LinearLayout {
 
     private void setViewValues() {
         if (mActivity == null) {
+            // Used?
             ((TextView)findViewById(R.id.activityname)).setText("IS NULL");
 
             return;
         }
 
-        String cssIcon = null;
+        int kind;
         try {
-            cssIcon = (String) MeteorWrapper.findKVMatch("activitytypes", "activityno", mActivity.getInt("kind"), "icon");
+            kind = mActivity.getInt("kind");
         } catch (JSONException e) {
-            // No problem.
+            // Nope! Need at least a kind!
+            return;
         }
+
+        String cssIcon = (String)MeteorWrapper.findKVMatch("activitytypes", "activityno", kind, "icon");
         ImageView icon = (ImageView)findViewById(R.id.activityicon);
         if (cssIcon != null) {
             String iconName = ResourceResolver.getIconFromClasses(cssIcon);
             icon.setImageResource(ResourceResolver.getIdentifierForDrawable(icon.getContext(), iconName));
+        }
+
+        if (mActivity.has("selectedSubgroups")) {
+            JSONArray subgroups;
+
+            try {
+                subgroups = mActivity.getJSONArray("selectedSubgroups");
+            } catch (JSONException e) {
+                subgroups = new JSONArray();
+            }
+
+            TextView tags = (TextView)findViewById(R.id.tags);
+
+            if (subgroups.length() > 0) {
+                tags.setText(ResourceResolver.getTagStringForSubgroups(subgroups, kind));
+            } else {
+                tags.setText("-\n ");
+            }
         }
 
         TextView week = (TextView)findViewById(R.id.week);
@@ -106,6 +129,17 @@ public class ActivityDetailsView extends LinearLayout {
         //String name = Generic.hasValue((String)mActivity.get("name")) ? (String)mActivity.get("name") : "-";
         //((TextView)findViewById(R.id.activityname)).setText(name);
 
+        try {
+            ((TextView)findViewById(R.id.time)).setText(TimeHelper.formatHMS(mActivity.getInt("hours"), mActivity.getInt("minutes"), mActivity.getInt("seconds")));
+        } catch (JSONException e) {
+            ((TextView)findViewById(R.id.time)).setText("");
+        }
+
+        try {
+            ((TextView)findViewById(R.id.distance)).setText(DistanceHelper.formatDistance(mActivity.getInt("distance"), mActivity.getInt("distancetype")));
+        } catch (JSONException e) {
+            ((TextView)findViewById(R.id.distance)).setText("");
+        }
     }
     @Override
     public void invalidate() {
