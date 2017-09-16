@@ -14,9 +14,9 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bla bla bla bla and so on." />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Running training plans are live updated from the fitness web-site burntrac.com." />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -32,5 +32,5 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Blub blub. A bit of a longer description. Not sure how this will actually show up." />
+        android:text="Current weather data as well as forecasts are gathered from The Weather Channel." />
 </GridLayout>

@@ -9,9 +9,13 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import im.delight.android.ddp.db.Collection;
 import im.delight.android.ddp.db.Database;
@@ -25,9 +29,12 @@ public class PlanAdapter extends BaseAdapter {
     private Context mContext;
     private HashMap<Integer, PlanView> mItems;
 
+    private Document[] mDocuments;
+
     public PlanAdapter(Context context) {
         mContext = context;
         mItems = new HashMap<Integer, PlanView>();
+        mDocuments = new Document[0];
     }
 
     @Override
@@ -45,20 +52,73 @@ public class PlanAdapter extends BaseAdapter {
                 Database database = MeteorWrapper.meteor.getDatabase();
 
                 if (database == null) {
+                    mDocuments = new Document[0];
+
                     return 0;
                 }
 
                 Collection collection = database.getCollection("activityplan");
 
                 if (collection == null) {
+                    mDocuments = new Document[0];
+
                     return 0;
                 }
 
-                return collection.count();
+                count = collection.count();
+
+                retries = 0;
             } catch (ConcurrentModificationException cme) {
                 retries--;
             }
         } while (retries > 0);
+
+        Document[] documentArray = null;
+        retries = 50;
+        do {
+            try {
+                documentArray = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").find();
+
+                retries = 0;
+            } catch (ConcurrentModificationException cme) {
+                retries--;
+            }
+        } while (retries > 0);
+
+        if (documentArray == null) {
+            mDocuments = new Document[0];
+
+            return 0;
+        }
+
+        LinkedList<LinkedHashMap> goals = new LinkedList<>();
+        for (Document document : documentArray) {
+            LinkedHashMap goal = ActivityHelper.findGoal(document);
+
+            goal.put("selfreference", document);
+            goals.add(goal);
+        }
+
+        final float metricGoal = PlanActivity.userGoal;
+        Comparator<LinkedHashMap> comparator = new Comparator<LinkedHashMap>() {
+            @Override
+            public int compare(LinkedHashMap left, LinkedHashMap right) {
+                float metricLeft = ActivityHelper.getMetricGoalDistance(left);
+                float metricRight = ActivityHelper.getMetricGoalDistance(right);
+
+                float distanceFromGoalLeft = Math.abs(metricLeft);
+                float distanceFromGoalRight = Math.abs(metricRight);
+
+                return (int)(-1 * Math.abs(distanceFromGoalLeft - distanceFromGoalRight));
+            }
+        };
+
+        Collections.sort(goals, comparator);
+
+        mDocuments = new Document[goals.size()];
+        for (int i = 0; i < mDocuments.length; i++) {
+            mDocuments[i] = (Document)goals.get(i).get("selfreference");
+        }
 
         return count;
     }
@@ -76,8 +136,8 @@ public class PlanAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
         PlanView view;
-        Document[] documentArray = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").find(1, position);
-        Document document = documentArray != null && documentArray.length == 1 ? documentArray[0] : null;
+
+        Document document = position < mDocuments.length ? mDocuments[position] : null;
 
         Date date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
 

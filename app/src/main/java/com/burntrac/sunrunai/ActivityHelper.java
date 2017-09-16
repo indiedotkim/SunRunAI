@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,9 +13,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import im.delight.android.ddp.db.Document;
 
 /**
  * Created by kim on 9/2/17.
@@ -191,5 +195,35 @@ public class ActivityHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return hasRows;
+    }
+
+    public static LinkedHashMap findGoal(Document plan) {
+        ArrayList details = (ArrayList)plan.getField("details");
+
+        for (Object object : details) {
+            LinkedHashMap detail = (LinkedHashMap)object;
+            ArrayList selectedTypes = (ArrayList)detail.get("selectedTypes");
+
+            if (selectedTypes.contains("race")) {
+                return detail;
+            }
+        }
+
+        return null;
+    }
+
+    public static float getMetricGoalDistance(LinkedHashMap goal) {
+        if (goal != null && goal.get("distance") != null && goal.get("distancetype") != null) {
+            float distance = Float.parseFloat(goal.get("distance").toString());
+            int distancetype = Integer.parseInt(goal.get("distancetype").toString());
+
+            if (distancetype == 3) {
+                return distance * 1.60934f;
+            } else {
+                return distance;
+            }
+        } else {
+            return 0f;
+        }
     }
 }

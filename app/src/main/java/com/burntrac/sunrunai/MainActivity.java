@@ -16,6 +16,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -26,7 +27,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.Switch;
 
 import im.delight.android.ddp.db.Document;
 import im.delight.android.ddp.db.memory.InMemoryDatabase;
@@ -54,6 +58,11 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
+        ActionBar actionBar = getActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorGradientActivityStart, null)));
+         */
+
         synchronized (CONTEXT) {
             if (sActivityHelper == null) {
                 sActivityHelper = new ActivityHelper(getApplicationContext());
@@ -64,12 +73,24 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         //mActivityHelper.addActivity(ActivityHelper.createActivity());
 
-        GridView gridview = (GridView) findViewById(R.id.daygridview);
+        final ImageView aiImage = (ImageView)findViewById(R.id.aiimage);
+        final Switch aiSwitch = (Switch)findViewById(R.id.aiswitch);
+        aiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    aiImage.setImageResource(R.drawable.ai);
+                } else {
+                    aiImage.setImageResource(R.drawable.ai_grey);
+                }
+            }
+        });
+
+        GridView gridview = (GridView)findViewById(R.id.daygridview);
         mDayAdapter = new DayAdapter(this, gridview.getContext());
         gridview.setAdapter(mDayAdapter);
 
-        //meteor = new Meteor(this, "wss://www.burntrac.com/websocket");
-        MeteorWrapper.meteor = new Meteor(this, "ws://192.168.1.106:3000/websocket", new InMemoryDatabase());
+        MeteorWrapper.meteor = new Meteor(this, PrivateConfig.socket, new InMemoryDatabase());
+        //MeteorWrapper.meteor = new Meteor(this, "ws://192.168.1.106:3000/websocket", new InMemoryDatabase());
         MeteorWrapper.meteor.addCallback(this);
         MeteorWrapper.meteor.connect();
 
@@ -125,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         switch (item.getItemId()) {
             case R.id.info:
                 AI.getOptimizedPlan(getApplicationContext());
+                getLocation();
                 return true;
             case R.id.plans:
                 i = new Intent(getApplicationContext(), PlanActivity.class);
@@ -141,30 +163,24 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
     @Override
     public void onConnect(boolean signedInAutomatically) {
-        Log.d(CONTEXT, "Connected");
-        Log.d(CONTEXT, "Is logged in: " + MeteorWrapper.meteor.isLoggedIn());
-        Log.d(CONTEXT, "User ID: " + MeteorWrapper.meteor.getUserId());
-
         if (signedInAutomatically) {
-            Log.d(CONTEXT, "LI SUC");
             MeteorWrapper.meteor.logout();
             signedInAutomatically = false;
-            Log.d(CONTEXT, "LI -> " + signedInAutomatically);
         }
 
         if (signedInAutomatically) {
-            Log.d(CONTEXT, "Successfully logged in automatically");
+            //Log.d(CONTEXT, "Successfully logged in automatically");
         } else {
-            MeteorWrapper.meteor.loginWithEmail("test4@indie.kim", "abcdef", new ResultListener() {
+            MeteorWrapper.meteor.loginWithEmail(PrivateConfig.email, PrivateConfig.password, new ResultListener() {
 
                 @Override
                 public void onSuccess(String result) {
-                    Log.d(CONTEXT, "Successfully logged in: " + result);
+                    //Log.d(CONTEXT, "Successfully logged in: " + result);
                 }
 
                 @Override
                 public void onError(String error, String reason, String details) {
-                    Log.d(CONTEXT, "Could not log in: " + error + " / " + reason + " / " + details);
+                    //Log.d(CONTEXT, "Could not log in: " + error + " / " + reason + " / " + details);
                 }
 
             });
@@ -264,6 +280,20 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             return;
         }
 
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null) {
+            WeatherIntentService.location = location;
+
+            WeatherWrapper.update(getApplicationContext(), this);
+        } else {
+            location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location != null) {
+                WeatherIntentService.location = location;
+
+                WeatherWrapper.update(getApplicationContext(), this);
+            }
+        }
+
         //mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, mLocationListener, null);
 
         //mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 1000, mLocationListener);
@@ -289,14 +319,16 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
                 // parse the JSON and manage the data yourself (not recommended)
                 // or
                 // enable a database (see section "Using databases to manage data") (recommended)
+                /*
                 Log.d(CONTEXT, "Added: " + collectionName + ", " + documentID + ", " + newValuesJson);
                 Log.d(CONTEXT, "Collections: " + MeteorWrapper.meteor.getDatabase().count() + "(" + TextUtils.join(", ", MeteorWrapper.meteor.getDatabase().getCollectionNames()) + ")");
                 Log.d(CONTEXT, "Activities: " + MeteorWrapper.meteor.getDatabase().getCollection("activity").count());
                 Log.d(CONTEXT, "Activity Plans: " + MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count());
+                 */
 
                 if (MeteorWrapper.meteor.getDatabase().getCollection("activityplan").count() > 0) {
                     Document doc = MeteorWrapper.meteor.getDatabase().getCollection("activityplan").findOne();
-                    Log.d(CONTEXT, "x");
+                    //Log.d(CONTEXT, "x");
                 }
 
                 retries = 0;
@@ -312,14 +344,14 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         // parse the JSON and manage the data yourself (not recommended)
         // or
         // enable a database (see section "Using databases to manage data") (recommended)
-        Log.d(CONTEXT, "Changed: " + collectionName + ", " + documentID + ", " + updatedValuesJson);
+        //Log.d(CONTEXT, "Changed: " + collectionName + ", " + documentID + ", " + updatedValuesJson);
     }
 
     public synchronized void onDataRemoved(String collectionName, String documentID) {
         // parse the JSON and manage the data yourself (not recommended)
         // or
         // enable a database (see section "Using databases to manage data") (recommended)
-        Log.d(CONTEXT, "Removed: " + collectionName + ", " + documentID);
+        //Log.d(CONTEXT, "Removed: " + collectionName + ", " + documentID);
     }
 
     @Override

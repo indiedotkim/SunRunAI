@@ -19,12 +19,14 @@ import android.widget.ToggleButton;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
 
 import im.delight.android.ddp.db.Document;
 
@@ -36,6 +38,7 @@ public class PlanView extends LinearLayout {
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy");
     private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
+    private Context mContext;
     private int mPosition;
     private Date mDate = new Date();
     private View mValue;
@@ -46,6 +49,7 @@ public class PlanView extends LinearLayout {
     public PlanView(Context context, AttributeSet attrs, int position, Document plan) {
         super(context, attrs);
 
+        mContext = context;
         mPosition = position;
         mPlan = plan;
 
@@ -122,6 +126,29 @@ public class PlanView extends LinearLayout {
         }
 
         ((TextView)findViewById(R.id.name)).setText((String)mPlan.getField("name"));
+
+        // mPlan.getField("comments").get(0).get("comment")
+        ArrayList comments = (ArrayList)mPlan.getField("comments");
+        if (comments != null && comments.size() > 0) {
+            LinkedHashMap comment = (LinkedHashMap)comments.get(0);
+            String commentString = (String)comment.get("comment");
+
+            if (commentString != null) {
+                ((TextView)findViewById(R.id.description)).setText(commentString);
+            } else {
+                ((TextView)findViewById(R.id.description)).setText("No description available.");
+            }
+        } else {
+            ((TextView)findViewById(R.id.description)).setText("No description available.");
+        }
+
+        LinkedHashMap goal = ActivityHelper.findGoal(mPlan);
+        if (goal != null && goal.get("distance") != null && goal.get("distancetype") != null) {
+            float distance = Float.parseFloat(goal.get("distance").toString());
+            int distancetype = Integer.parseInt(goal.get("distancetype").toString());
+
+            ((TextView)findViewById(R.id.plangoal)).setText(DistanceHelper.formatDistance(mContext.getApplicationContext(), distance, distancetype));
+        }
     }
 
     public Document getPlan() {

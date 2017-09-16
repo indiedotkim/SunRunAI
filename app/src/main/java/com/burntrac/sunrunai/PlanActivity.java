@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +33,9 @@ public class PlanActivity extends AppCompatActivity {
 
     private PlanAdapter mPlanAdapter;
 
+    private static int INITIAL_GOAL = 10;
+    public static int userGoal = INITIAL_GOAL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +46,36 @@ public class PlanActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
 
         //dialog.show();
+
+        final TextView goalComposite = (TextView)findViewById(R.id.goalcomposite);
+
+        SeekBar goalBar = (SeekBar)findViewById(R.id.goalbar);
+        goalBar.setProgress(INITIAL_GOAL);
+
+        goalBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
+                goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)progress, useMetric ? 2 : 3));
+
+                userGoal = progress;
+
+                mPlanAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 
         ListView view = (ListView)findViewById(R.id.planlist);
         mPlanAdapter = new PlanAdapter(view.getContext());
