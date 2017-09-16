@@ -98,4 +98,13 @@ public class PlanAdapter extends BaseAdapter {
 
         return view;
     }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        for (PlanView view : mItems.values()) {
+            view.invalidate();
+        }
+    }
 }

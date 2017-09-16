@@ -18,6 +18,6 @@
         android:id="@+id/settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="Settings"
-        app:showAsAction="always" />
+        android:visible="false" />
 
 </menu>

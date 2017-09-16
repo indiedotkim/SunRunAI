@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -144,6 +145,8 @@ public class PlanView extends LinearLayout {
     public void invalidate() {
         super.invalidate();
 
-        mActivityDetailsAdapter.notifyDataSetChanged();
+        if (mActivityDetailsAdapter != null) {
+            mActivityDetailsAdapter.notifyDataSetChanged();
+        }
     }
 }

@@ -20,6 +20,7 @@ import java.util.Date;
  */
 
 public class ActivityDetailsView extends LinearLayout {
+    private Context mContext;
     private View mValue;
     private ImageView mImage;
 
@@ -35,6 +36,7 @@ public class ActivityDetailsView extends LinearLayout {
     public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart, JSONObject activity) {
         super(context, attrs);
 
+        mContext = context;
         mPosition = position;
         mActivity = activity;
         mActivityDetails = activitydetails;
@@ -155,7 +157,7 @@ public class ActivityDetailsView extends LinearLayout {
         }
 
         try {
-            ((TextView)findViewById(R.id.distance)).setText(DistanceHelper.formatDistance(mActivityDetails.getInt("distance"), mActivityDetails.getInt("distancetype")));
+            ((TextView)findViewById(R.id.distance)).setText(DistanceHelper.formatDistance(mContext.getApplicationContext(), mActivityDetails.getInt("distance"), mActivityDetails.getInt("distancetype")));
         } catch (JSONException e) {
             ((TextView)findViewById(R.id.distance)).setText("");
         }
