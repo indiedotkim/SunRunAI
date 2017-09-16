@@ -3,14 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/info"
+        android:icon="@drawable/ic_1124_info"
+        android:title="Item"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/plans"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_0852_clipboard4_plus"
         android:title="Plans"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="Settings"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
 </menu>

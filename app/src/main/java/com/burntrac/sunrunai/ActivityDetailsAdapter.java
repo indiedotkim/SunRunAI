@@ -23,13 +23,19 @@ public class ActivityDetailsAdapter extends BaseAdapter {
 
     private Context mContext;
     private int mPosition;
+    private JSONObject mActivity;
     private JSONArray mActivities;
     private HashMap<Integer, ActivityDetailsView> mItems;
     private Date mPlanStart;
 
     public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart) {
+        this(context, position, activities, planstart, null);
+    }
+
+    public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart, JSONObject activity) {
         mContext = context;
         mPosition = position;
+        mActivity = activity;
         mActivities = activities == null ? new JSONArray() : activities;
         mItems = new HashMap<Integer, ActivityDetailsView>();
         mPlanStart = planstart;
@@ -61,12 +67,13 @@ public class ActivityDetailsAdapter extends BaseAdapter {
         }
 
         if (convertView == null) {
-            view = new ActivityDetailsView(mContext, null, position, details, mPlanStart);
+            view = new ActivityDetailsView(mContext, null, position, details, mPlanStart, mActivity);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
         } else {
             view = (ActivityDetailsView)convertView;
+            view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             view.override(position, details, mPlanStart);
 

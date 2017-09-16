@@ -90,7 +90,7 @@ public class PlanView extends LinearLayout {
     private void setViewValues() {
         setViewValues(false);
     }
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+
     private void setViewValues(boolean updateDateOnly) {
         if (mPlan == null) {
             return;
@@ -113,9 +113,10 @@ public class PlanView extends LinearLayout {
             }
 
             GridView view = (GridView)findViewById(R.id.planactivitylist);
-            JSONArray details = null;
-            details = new JSONArray((Collection)mPlan.getField("details"));
+            JSONArray details = new JSONArray((Collection)mPlan.getField("details"));
+
             mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, mDate);
+
             view.setAdapter(mActivityDetailsAdapter);
         }
 

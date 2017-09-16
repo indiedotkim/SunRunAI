@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +78,18 @@ public class ActivityHelper extends SQLiteOpenHelper {
         activity.put("details", details);
 
         return new JSONObject(activity);
+    }
+
+    public static JSONObject createActivity(String name,
+                                            List[] comments,
+                                            Date datetime,
+                                            int schedule,
+                                            Map detail) {
+        List details = new LinkedList();
+
+        details.add(detail);
+
+        return createActivity(name, comments, datetime, schedule, details);
     }
 
     public static JSONObject createActivity() {
@@ -162,5 +175,17 @@ public class ActivityHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         db.rawQuery("DROP TABLE " + TABLE_NAME, null);
+    }
+
+    public synchronized boolean hasScheduledActivities() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE schedule = " + Generic.SCHEDULE_PLANNED + ";", null);
+
+        boolean hasRows = cursor.getCount() > 0;
+
+        cursor.close();
+
+        return hasRows;
     }
 }

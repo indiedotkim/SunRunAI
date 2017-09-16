@@ -12,4 +12,7 @@
     <!-- *** -->
     <color name="colorCardPlanned">#eeeeee</color>
     <color name="colorCardWorkout">#ffe9a1</color>
+    <!-- *** -->
+    <color name="colorGradientActivityStart">#65d3ff</color>
+    <color name="colorGradientActivityEnd">#ffffff</color>
 </resources>

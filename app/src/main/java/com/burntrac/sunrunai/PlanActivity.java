@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import im.delight.android.ddp.db.Document;
 
@@ -63,17 +65,20 @@ public class PlanActivity extends AppCompatActivity {
                         Date planStart = ((PlanView)childView).getStartDate();
 
                         for (Object object : (ArrayList)plan.getField("details")) {
-                            LinkedHashMap details = (LinkedHashMap)object;
+                            LinkedHashMap detail = (LinkedHashMap)object;
                             HashMap activity = new HashMap();
 
                             activity.put("name", "");
                             activity.put("comments", new ArrayList());
 
-                            Date activityDate = DateHelper.getNDaysAhead(planStart, ((int)details.get("week") - 1) * 8 + (int)details.get("day") - 1);
+                            Date activityDate = DateHelper.getNDaysAhead(planStart, ((int)detail.get("week") - 1) * 8 + (int)detail.get("day") - 1);
                             activity.put("datetime", activityDate.getTime());
 
                             activity.put("deleted", false);
                             activity.put("schedule", Generic.SCHEDULE_PLANNED);
+
+                            List details = new LinkedList();
+                            details.add(detail);
 
                             activity.put("details", details);
 
@@ -114,6 +119,10 @@ public class PlanActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                finish();
+                return true;
+            case R.id.planclear:
+                MainActivity.sActivityHelper.deleteScheduledActivities();
                 finish();
                 return true;
             default:

@@ -8,15 +8,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 /**
  * Created by kim on 8/29/17.
@@ -28,13 +25,19 @@ public class ActivityDetailsView extends LinearLayout {
 
     private int mPosition;
     private JSONObject mActivity;
+    private JSONObject mActivityDetails;
     private Date mPlanStart;
 
-    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activity, Date planstart) {
+    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart) {
+        this(context, attrs, position, activitydetails, planstart, null);
+    }
+
+    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart, JSONObject activity) {
         super(context, attrs);
 
         mPosition = position;
         mActivity = activity;
+        mActivityDetails = activitydetails;
         mPlanStart = planstart;
 
         LayoutInflater inflater = (LayoutInflater)context
@@ -46,23 +49,23 @@ public class ActivityDetailsView extends LinearLayout {
 
     public void override(int position, JSONObject activity, Date planstart) {
         mPosition = position;
-        mActivity = activity;
+        mActivityDetails = activity;
         mPlanStart = planstart;
 
         setViewValues();
     }
 
     private void setViewValues() {
-        if (mActivity == null) {
+        if (mActivityDetails == null) {
             // Used?
-            ((TextView)findViewById(R.id.activityname)).setText("IS NULL");
+            //((TextView)findViewById(R.id.activityname)).setText("IS NULL");
 
             return;
         }
 
         int kind;
         try {
-            kind = mActivity.getInt("kind");
+            kind = mActivityDetails.getInt("kind");
         } catch (JSONException e) {
             // Nope! Need at least a kind!
             return;
@@ -75,11 +78,11 @@ public class ActivityDetailsView extends LinearLayout {
             icon.setImageResource(ResourceResolver.getIdentifierForDrawable(icon.getContext(), iconName));
         }
 
-        if (mActivity.has("selectedSubgroups")) {
+        if (mActivityDetails.has("selectedSubgroups")) {
             JSONArray subgroups;
 
             try {
-                subgroups = mActivity.getJSONArray("selectedSubgroups");
+                subgroups = mActivityDetails.getJSONArray("selectedSubgroups");
             } catch (JSONException e) {
                 subgroups = new JSONArray();
             }
@@ -98,7 +101,7 @@ public class ActivityDetailsView extends LinearLayout {
 
         if (week != null) {
             try {
-                String weekValue = Generic.hasValue(mActivity.getInt("week")) ? "" + mActivity.getInt("week") : "-";
+                String weekValue = Generic.hasValue(mActivityDetails.getInt("week")) ? "" + mActivityDetails.getInt("week") : "-";
                 week.setText(weekValue);
             } catch (JSONException e) {
                 // No problem.
@@ -106,7 +109,7 @@ public class ActivityDetailsView extends LinearLayout {
         }
         if (day != null) {
             try {
-                String dayValue = Generic.hasValue(mActivity.getInt("day")) ? "" + mActivity.getInt("day") : "-";
+                String dayValue = Generic.hasValue(mActivityDetails.getInt("day")) ? "" + mActivityDetails.getInt("day") : "-";
                 day.setText(dayValue);
             } catch (JSONException e) {
                 // No problem.
@@ -115,8 +118,8 @@ public class ActivityDetailsView extends LinearLayout {
 
         if (mPlanStart != null && week != null && day != null) {
             try {
-                int weekNo = Generic.hasValue(mActivity.getInt("week")) ? mActivity.getInt("week") : 1;
-                int dayNo = Generic.hasValue(mActivity.getInt("day")) ? mActivity.getInt("day") : 1;
+                int weekNo = Generic.hasValue(mActivityDetails.getInt("week")) ? mActivityDetails.getInt("week") : 1;
+                int dayNo = Generic.hasValue(mActivityDetails.getInt("day")) ? mActivityDetails.getInt("day") : 1;
 
                 Date activityDate = DateHelper.getNDaysAhead(mPlanStart, (weekNo - 1) * 8 + dayNo - 1);
 
@@ -125,18 +128,27 @@ public class ActivityDetailsView extends LinearLayout {
             } catch (JSONException e) {
                 // No problem.
             }
+        } else if (mActivity != null) {
+            try {
+                Date activityDate = new Date(mActivity.getLong("datetime"));
+
+                ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
+                ((TextView)findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+            } catch (JSONException e) {
+                // No problem.
+            }
         }
-        //String name = Generic.hasValue((String)mActivity.get("name")) ? (String)mActivity.get("name") : "-";
+        //String name = Generic.hasValue((String)mActivityDetails.get("name")) ? (String)mActivityDetails.get("name") : "-";
         //((TextView)findViewById(R.id.activityname)).setText(name);
 
         try {
-            ((TextView)findViewById(R.id.time)).setText(TimeHelper.formatHMS(mActivity.getInt("hours"), mActivity.getInt("minutes"), mActivity.getInt("seconds")));
+            ((TextView)findViewById(R.id.time)).setText(TimeHelper.formatHMS(mActivityDetails.getInt("hours"), mActivityDetails.getInt("minutes"), mActivityDetails.getInt("seconds")));
         } catch (JSONException e) {
             ((TextView)findViewById(R.id.time)).setText("");
         }
 
         try {
-            ((TextView)findViewById(R.id.distance)).setText(DistanceHelper.formatDistance(mActivity.getInt("distance"), mActivity.getInt("distancetype")));
+            ((TextView)findViewById(R.id.distance)).setText(DistanceHelper.formatDistance(mActivityDetails.getInt("distance"), mActivityDetails.getInt("distancetype")));
         } catch (JSONException e) {
             ((TextView)findViewById(R.id.distance)).setText("");
         }

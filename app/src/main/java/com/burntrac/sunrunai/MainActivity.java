@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
 
+    private Menu mMenu;
+
     public static ActivityHelper sActivityHelper;
     private DayAdapter mDayAdapter;
 
@@ -45,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private String activityPlanId;
     private String activityTypesId;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.app_menu, menu);
 
+        mMenu = menu;
+
+        updateMenuIcons();
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -141,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             signedInAutomatically = false;
             Log.d(CONTEXT, "LI -> " + signedInAutomatically);
         }
-        Log.d(CONTEXT, "XXXXXXXXXXX");
 
         if (signedInAutomatically) {
             Log.d(CONTEXT, "Successfully logged in automatically");
@@ -315,11 +319,21 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
     @Override
     public void onCompletion() {
+        updateMenuIcons();
         mDayAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        updateMenuIcons();
         mDayAdapter.notifyDataSetChanged();
+    }
+
+    private void updateMenuIcons() {
+        if (sActivityHelper.hasScheduledActivities()) {
+            mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_change);
+        } else {
+            mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_plus);
+        }
     }
 }

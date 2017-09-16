@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -15,6 +16,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
@@ -22,6 +27,8 @@ import java.util.HashMap;
  */
 
 public class ActivityView extends LinearLayout {
+    private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+
     private View mValue;
     private ImageView mImage;
 
@@ -47,43 +54,45 @@ public class ActivityView extends LinearLayout {
             // No problem.
         }
 
-        setActivity(context);
-
-        ListView listview = (ListView)findViewById(R.id.activitydetailsview);
-        mActivityDetailsAdapter = new ActivityDetailsAdapter(context, mPosition, details, null);
-        listview.setAdapter(mActivityDetailsAdapter);
+        setViewValues();
     }
 
     public void override(int position, JSONObject activity) {
         mPosition = position;
         mActivity = activity;
+
+        setViewValues();
     }
 
-    private void setActivity(Context context) {
-        if (mActivity == null) {
-            ((TextView)findViewById(R.id.activityname)).setText("Rest");
-
-            ImageView icon = (ImageView)findViewById(R.id.activityicon);
-            String iconName = ResourceResolver.getIconFromClasses("bt-activity-icon-rest");
-            icon.setImageResource(ResourceResolver.getIdentifierForDrawable(icon.getContext(), iconName));
-
-            return;
-        }
-
-        String name = null;
-        try {
-            name = Generic.hasValue(mActivity.getString("name")) ? mActivity.getString("name") : "-";
-        } catch (JSONException e) {
-            name = "-";
-        }
-
-        ((TextView)findViewById(R.id.activityname)).setText(name + "UU");
-
-    }
     @Override
     public void invalidate() {
         super.invalidate();
 
-        setActivity(getContext());
+        mActivityDetailsAdapter.notifyDataSetChanged();
+    }
+
+    public int getCalculatedHeight() {
+        int height; // Not needed here: = mActivityDetailsAdapter != null && mActivity != null ? mActivityDetailsAdapter.getMeasuredHeight() : 0;
+
+        this.measure(UNBOUNDED, UNBOUNDED);
+        height = this.getMeasuredHeight();
+
+        return height;
+    }
+
+    private void setViewValues() {
+        GridView view = (GridView)findViewById(R.id.activitydetailsview);
+
+        JSONArray details = null; // new JSONArray((Collection)mPlan.getField("details"));
+
+        try {
+            details = mActivity != null ? mActivity.getJSONArray("details") : null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, null, mActivity);
+
+        view.setAdapter(mActivityDetailsAdapter);
     }
 }

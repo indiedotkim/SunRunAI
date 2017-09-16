@@ -174,6 +174,24 @@ public class WeatherWrapper extends ResultReceiver {
         }
     }
 
+    public static float getRainValue(Date date) {
+        JSONObject object = getObjectForDate(date);
+
+        if (object == null) {
+            return 0f;
+        }
+
+        try {
+            if (object.has("qpf")) {
+                return Float.valueOf(object.getString("qpf"));
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return 0f;
+    }
+
     public static String getRain(Date date) {
         JSONObject object = getObjectForDate(date);
 
@@ -192,6 +210,35 @@ public class WeatherWrapper extends ResultReceiver {
         return "-";
     }
 
+    public static float getTemperatureValue(Date date) {
+        JSONObject object = getObjectForDate(date);
+
+        if (object == null) {
+            return 0f;
+        }
+
+        try {
+            JSONObject details;
+
+            if (object.has("metric")) {
+                details = object.getJSONObject("metric");
+            } else if (object.has("imperial")) {
+                details = object.getJSONObject("imperial");
+            } else {
+                return 0f;
+            }
+
+            if (details.has("temp")) {
+                return Float.valueOf(details.getString("temp"));
+            }
+
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return 0f;
+    }
+
     public static String getTemperature(Date date) {
         JSONObject object = getObjectForDate(date);
 
@@ -200,13 +247,20 @@ public class WeatherWrapper extends ResultReceiver {
         }
 
         try {
-            if (object.has("metric")) {
-                JSONObject metric = object.getJSONObject("metric");
+            JSONObject details;
 
-                if (metric.has("temp")) {
-                    return metric.getString("temp") + getTemperatureUnit();
-                }
+            if (object.has("metric")) {
+                details = object.getJSONObject("metric");
+            } else if (object.has("imperial")) {
+                details = object.getJSONObject("imperial");
+            } else {
+                return "-";
             }
+
+            if (details.has("temp")) {
+                return details.getString("temp") + getTemperatureUnit();
+            }
+
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
         }

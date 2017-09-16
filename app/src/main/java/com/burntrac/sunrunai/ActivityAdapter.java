@@ -48,11 +48,12 @@ public class ActivityAdapter extends BaseAdapter {
 
         if (convertView == null) {
             view = new ActivityView(mContext, null, position, activity);
-            view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, getListHeight()));
+            view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, view.getCalculatedHeight()));
 
             mItems.put(position, view);
         } else {
             view = (ActivityView)convertView;
+            view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, view.getCalculatedHeight()));
 
             view.override(position, activity);
 
