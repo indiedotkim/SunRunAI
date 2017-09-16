@@ -42,7 +42,12 @@ public class ActivityDetailsView extends LinearLayout {
 
         LayoutInflater inflater = (LayoutInflater)context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_activity_details, this, true);
+
+        if (planstart != null) {
+            inflater.inflate(R.layout.view_activity_details, this, true);
+        } else {
+            inflater.inflate(R.layout.view_activity_details_ai, this, true);
+        }
 
         setViewValues();
     }
@@ -130,10 +135,12 @@ public class ActivityDetailsView extends LinearLayout {
             }
         } else if (mActivity != null) {
             try {
-                Date activityDate = new Date(mActivity.getLong("datetime"));
+                if (mPlanStart != null) {
+                    Date activityDate = new Date(mActivity.getLong("datetime"));
 
-                ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
-                ((TextView)findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+                    ((TextView) findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
+                    ((TextView) findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+                }
             } catch (JSONException e) {
                 // No problem.
             }

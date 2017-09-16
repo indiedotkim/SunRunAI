@@ -237,7 +237,7 @@ public class WeatherWrapper extends ResultReceiver {
             }
 
             if (details.has("temp")) {
-                return details.getLong("temp");
+                return Math.round(details.getLong("temp") * 10f) / 10f;
             }
 
         } catch (JSONException e) {
@@ -305,7 +305,7 @@ public class WeatherWrapper extends ResultReceiver {
                 throw new JSONException("B");
             }
             if (object.has("max_temp")) {
-                return 22f - 10f * (random.nextFloat() - 0.5f);
+                return Math.round((22f - 10f * (random.nextFloat() - 0.5f)) * 10f) / 10f;
                 //return object.getLong("max_temp");
             }
         } catch (JSONException e) {

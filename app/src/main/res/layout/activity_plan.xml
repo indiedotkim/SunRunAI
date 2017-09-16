@@ -111,7 +111,7 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:text='Approximate running goal distance at the end of the training plan. Aka "Race distance".'
+        android:text="Approximate running goal distance at the end of the training plan."
         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
         app:layout_constraintLeft_toLeftOf="@+id/textView7"
         app:layout_constraintRight_toLeftOf="@+id/textView10"

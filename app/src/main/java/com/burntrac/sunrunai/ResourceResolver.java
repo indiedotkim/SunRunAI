@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,19 +77,30 @@ public final class ResourceResolver {
     }
 
     public static String getTagString(JSONArray tags, int kind, String type) {
-        Database database = MeteorWrapper.meteor.getDatabase();
+        Document result = null;
+        int retries = 100;
 
-        if (database == null) {
-            return "";
-        }
+        do {
+            try {
+                Database database = MeteorWrapper.meteor.getDatabase();
 
-        Collection collection = database.getCollection("activitytypes");
+                if (database == null) {
+                    return "";
+                }
 
-        if (collection == null) {
-            return "";
-        }
+                Collection collection = database.getCollection("activitytypes");
 
-        Document result = MeteorWrapper.meteor.getDatabase().getCollection("activitytypes").whereEqual("activityno", kind).findOne();
+                if (collection == null) {
+                    return "";
+                }
+
+                result = MeteorWrapper.meteor.getDatabase().getCollection("activitytypes").whereEqual("activityno", kind).findOne();
+
+                retries = 0;
+            } catch (ConcurrentModificationException cme) {
+                retries--;
+            }
+        } while (retries > 0);
 
         if (result == null) {
             return "";

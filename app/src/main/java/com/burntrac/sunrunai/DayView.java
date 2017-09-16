@@ -74,7 +74,12 @@ public class DayView extends LinearLayout {
         ((TextView)findViewById(R.id.datesuffix)).setText(DateHelper.formatDateSuffix(mDate));
 
         ((TextView)findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperature(mDate));
-        ((TextView)findViewById(R.id.temperaturemax)).setText(WeatherWrapper.getTemperatureMax(mDate));
+
+        String maxTemp = WeatherWrapper.getTemperatureMax(mDate);
+        if (maxTemp != null && maxTemp.length() > 0) {
+            ((TextView) findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperatureMax(mDate));
+        }
+
         ((TextView)findViewById(R.id.temperaturemin)).setText(WeatherWrapper.getTemperatureMin(mDate));
         ((TextView)findViewById(R.id.rain)).setText(WeatherWrapper.getRain(mDate));
         ((TextView)findViewById(R.id.winddirection)).setText(WeatherWrapper.getWindDirection(mDate));
