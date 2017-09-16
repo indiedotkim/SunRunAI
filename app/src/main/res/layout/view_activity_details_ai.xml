@@ -10,6 +10,17 @@
     android:paddingTop="6dp">
 
     <ImageView
+        android:id="@+id/typeicon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="0dp"
+        android:tint="@android:color/darker_gray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_0852_clipboard4_blank" />
+
+    <ImageView
         android:id="@+id/activityicon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,27 +88,15 @@
         app:layout_constraintTop_toBottomOf="@+id/time" />
 
     <TextView
-        android:id="@+id/week"
-        android:layout_width="26dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:text="42"
-        android:textAlignment="center"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/deltadays"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="2dp"
         android:text="7"
         android:textAlignment="center"
-        app:layout_constraintLeft_toRightOf="@+id/week"
-        app:layout_constraintTop_toTopOf="@+id/week" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/typelabel"
@@ -106,8 +105,10 @@
         android:text="Type"
         android:textAlignment="center"
         android:textSize="10sp"
-        app:layout_constraintLeft_toLeftOf="@+id/week"
-        app:layout_constraintTop_toBottomOf="@+id/week" />
+        app:layout_constraintTop_toTopOf="@+id/daylabel"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
         android:id="@+id/daylabel"

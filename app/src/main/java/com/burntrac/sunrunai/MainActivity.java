@@ -152,8 +152,26 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         switch (item.getItemId()) {
             case R.id.info:
-                AI.getOptimizedPlan(getApplicationContext());
-                getLocation();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                View view = getLayoutInflater().inflate(R.layout.dialog_info, null);
+                builder.setView(view);
+                builder.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        //Intent i = new Intent(getApplicationContext(), PlanActivity.class);
+                        //startActivity(i);
+                    }
+                });
+
+                dialog.show();
+
                 return true;
             case R.id.plans:
                 i = new Intent(getApplicationContext(), PlanActivity.class);
@@ -384,6 +402,30 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_change);
         } else {
             mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_plus);
+        }
+    }
+
+    public void switchViaImage(View view) {
+        ImageView aiImage = (ImageView)findViewById(R.id.aiimage);
+        Switch aiSwitch = (Switch)findViewById(R.id.aiswitch);
+
+        boolean isChecked = !aiSwitch.isChecked();
+
+        aiSwitch.setChecked(isChecked);
+
+        if (isChecked) {
+            aiImage.setImageResource(R.drawable.ai);
+
+            AI.getOptimizedPlan(getApplicationContext());
+            AI.isActivated = true;
+
+            mDayAdapter.notifyDataSetChanged();
+        } else {
+            aiImage.setImageResource(R.drawable.ai_grey);
+
+            AI.isActivated = false;
+
+            mDayAdapter.notifyDataSetChanged();
         }
     }
 }

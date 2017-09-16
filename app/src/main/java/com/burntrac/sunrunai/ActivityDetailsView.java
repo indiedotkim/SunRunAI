@@ -145,8 +145,15 @@ public class ActivityDetailsView extends LinearLayout {
                     ((TextView) findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
                 } else {
                     // Inside day view.
-
                     ((TextView) findViewById(R.id.deltadays)).setText(mActivity.get("sunrunai_change").toString());
+                    ((TextView) findViewById(R.id.annotation)).setText(mActivity.get("sunrunai_reason").toString());
+
+                    ImageView typeIcon = (ImageView)findViewById(R.id.typeicon);
+                    if ((int)mActivity.get("sunrunai_change") != 0) {
+                        typeIcon.setImageResource(R.drawable.ic_robot);
+                    } else {
+                        typeIcon.setImageResource(R.drawable.ic_0852_clipboard4_blank);
+                    }
                 }
             } catch (JSONException e) {
                 // No problem.

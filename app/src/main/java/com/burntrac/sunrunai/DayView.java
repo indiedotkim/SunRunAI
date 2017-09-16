@@ -80,7 +80,17 @@ public class DayView extends LinearLayout {
             ((TextView) findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperatureMax(mDate));
         }
 
-        ((TextView)findViewById(R.id.temperaturemin)).setText(WeatherWrapper.getTemperatureMin(mDate));
+        String tempMin = WeatherWrapper.getTemperatureMin(mDate);
+        if (tempMin == null || tempMin.length() == 0) {
+            ((TextView)findViewById(R.id.temperaturemin)).setText("");
+            ((TextView)findViewById(R.id.temperaturehi)).setText("Temperature");
+            ((TextView)findViewById(R.id.temperaturelo)).setText("");
+        } else {
+            ((TextView)findViewById(R.id.temperaturemin)).setText(WeatherWrapper.getTemperatureMin(mDate));
+            ((TextView)findViewById(R.id.temperaturehi)).setText("Hi");
+            ((TextView)findViewById(R.id.temperaturelo)).setText("Lo");
+        }
+
         ((TextView)findViewById(R.id.rain)).setText(WeatherWrapper.getRain(mDate));
         ((TextView)findViewById(R.id.winddirection)).setText(WeatherWrapper.getWindDirection(mDate));
         ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed(mDate));

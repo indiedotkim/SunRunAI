@@ -56,6 +56,10 @@ public class PlanActivity extends AppCompatActivity {
         SeekBar goalBar = (SeekBar)findViewById(R.id.goalbar);
         goalBar.setProgress(INITIAL_GOAL);
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+        goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)goalBar.getProgress(), useMetric ? 2 : 3));
+
         goalBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -178,6 +182,11 @@ public class PlanActivity extends AppCompatActivity {
         boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
 
         sharedPrefs.edit().putBoolean(SettingsActivity.PREF_USE_METRIC, !useMetric).commit();
+
+        SeekBar goalBar = (SeekBar)findViewById(R.id.goalbar);
+
+        TextView goalComposite = (TextView)findViewById(R.id.goalcomposite);
+        goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)goalBar.getProgress(), !useMetric ? 2 : 3));
 
         mPlanAdapter.notifyDataSetChanged();
     }

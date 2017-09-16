@@ -62,7 +62,7 @@
         app:layout_constraintTop_toTopOf="@+id/temperature" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/temperaturehi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Temperature"
@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/temperature" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/temperaturelo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Low"
@@ -121,7 +121,7 @@
         android:text="wind"
         android:textSize="12sp"
         app:layout_constraintLeft_toRightOf="@+id/rain"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/temperaturehi" />
 
     <TextView
         android:id="@+id/textView12"
