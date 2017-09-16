@@ -130,6 +130,8 @@ public class ActivityHelper extends SQLiteOpenHelper {
         }
 
         if (cursor.getCount() == 0) {
+            cursor.close();
+
             return activities;
         }
 
@@ -145,6 +147,8 @@ public class ActivityHelper extends SQLiteOpenHelper {
                 // TODO Report corrupt database.
             }
         };
+
+        cursor.close();
 
         return activities;
     }

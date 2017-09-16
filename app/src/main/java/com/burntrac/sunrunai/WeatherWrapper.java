@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -28,6 +30,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 /**
  * Created by kim on 8/29/17.
@@ -39,7 +42,9 @@ public class WeatherWrapper extends ResultReceiver {
 
     public static JSONObject today = null;
     public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
-    public static boolean useMetric = WeatherIntentService.useMetric;
+    public static boolean useMetric = SettingsActivity.DEFAULT_USE_METRIC;
+
+    private static Random random = new Random(2);
 
     private WeatherWrapper(Handler handler, OnCompletionListener completionListener) {
         super(handler);
@@ -113,6 +118,9 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static void update(Context context, OnCompletionListener completionListener) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
         WeatherWrapper receiver = new WeatherWrapper(new Handler(), completionListener);
 
         Intent intent = new Intent(context, WeatherIntentService.class);
@@ -229,7 +237,7 @@ public class WeatherWrapper extends ResultReceiver {
             }
 
             if (details.has("temp")) {
-                return Float.valueOf(details.getString("temp"));
+                return details.getLong("temp");
             }
 
         } catch (JSONException e) {
@@ -258,9 +266,8 @@ public class WeatherWrapper extends ResultReceiver {
             }
 
             if (details.has("temp")) {
-                return details.getString("temp") + getTemperatureUnit();
+                return getTemperatureValue(date) + getTemperatureUnit();
             }
-
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
         }
@@ -286,6 +293,28 @@ public class WeatherWrapper extends ResultReceiver {
         return "-";
     }
 
+    public static float getTemperatureMaxValue(Date date) {
+        JSONObject object = getObjectForDate(date, true);
+
+        if (object == null) {
+            return 0f;
+        }
+
+        try {
+            if (12 == 72) {
+                throw new JSONException("B");
+            }
+            if (object.has("max_temp")) {
+                return 22f - 10f * (random.nextFloat() - 0.5f);
+                //return object.getLong("max_temp");
+            }
+        } catch (JSONException e) {
+            // Ignore. Too late to catch here.
+        }
+
+        return 0f;
+    }
+
     public static String getTemperatureMax(Date date) {
         JSONObject object = getObjectForDate(date, true);
 
@@ -293,12 +322,8 @@ public class WeatherWrapper extends ResultReceiver {
             return "";
         }
 
-        try {
-            if (object.has("max_temp")) {
-                return object.getString("max_temp") + getTemperatureUnit();
-            }
-        } catch (JSONException e) {
-            // Ignore. Too late to catch here.
+        if (object.has("max_temp")) {
+            return getTemperatureMaxValue(date) + getTemperatureUnit();
         }
 
         return "-";

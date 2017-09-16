@@ -121,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         Intent i;
 
         switch (item.getItemId()) {
+            case R.id.info:
+                AI.getOptimizedPlan(getApplicationContext());
+                return true;
             case R.id.plans:
                 i = new Intent(getApplicationContext(), PlanActivity.class);
                 startActivityForResult(i, Generic.STATUS_PLAN_ADDED);
@@ -320,12 +323,18 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     @Override
     public void onCompletion() {
         updateMenuIcons();
+
+        AI.getOptimizedPlan(getApplicationContext());
+
         mDayAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         updateMenuIcons();
+
+        AI.getOptimizedPlan(getApplicationContext());
+
         mDayAdapter.notifyDataSetChanged();
     }
 

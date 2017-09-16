@@ -114,7 +114,7 @@ public class DayAdapter extends BaseAdapter {
             activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd);
         } else {
             activities = new ArrayList();
-            activities.add(ActivityHelper.createActivity());
+            //activities.add(ActivityHelper.createActivity());
         }
 
         Date date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);

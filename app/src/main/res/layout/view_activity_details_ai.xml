@@ -30,51 +30,38 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="2dp"
-        app:layout_constraintHorizontal_bias="0.562"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weeklabel">
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@+id/typelabel">
 
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/annotation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
             android:layout_marginTop="0dp"
-            android:text="MMM, DD"
+            android:text="annotation"
             android:textSize="12sp"
             android:textStyle="italic"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/dateordinal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginTop="0dp"
-            android:text="OR"
-            android:textSize="8sp"
-            android:textStyle="italic"
-            app:layout_constraintLeft_toRightOf="@+id/date"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/date" />
     </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/time"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="42dp"
         android:text="0:00:00"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="@+id/weeklabel"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/typelabel" />
 
     <TextView
         android:id="@+id/distance"
@@ -113,10 +100,10 @@
         app:layout_constraintTop_toTopOf="@+id/week" />
 
     <TextView
-        android:id="@+id/weeklabel"
+        android:id="@+id/typelabel"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
-        android:text="AI"
+        android:text="Type"
         android:textAlignment="center"
         android:textSize="10sp"
         app:layout_constraintLeft_toLeftOf="@+id/week"
