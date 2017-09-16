@@ -44,7 +44,9 @@ public class WeatherWrapper extends ResultReceiver {
     public static List<JSONObject> forecasts = Collections.synchronizedList(new ArrayList<JSONObject>());
     public static boolean useMetric = SettingsActivity.DEFAULT_USE_METRIC;
 
-    private static Random random = new Random(2);
+    public static Context sContext;
+
+    private static Random random = new Random(0);
 
     private WeatherWrapper(Handler handler, OnCompletionListener completionListener) {
         super(handler);
@@ -294,7 +296,8 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static float getTemperatureMaxValue(Date date) {
-        random = new Random(date.getTime());
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
+        boolean randomize = sharedPrefs.getBoolean(SettingsActivity.PREF_RANDOMIZE, SettingsActivity.DEFAULT_RANDOMIZE);
 
         JSONObject object = getObjectForDate(date, true);
 
@@ -303,12 +306,13 @@ public class WeatherWrapper extends ResultReceiver {
         }
 
         try {
-            if (12 == 72) {
-                throw new JSONException("B");
-            }
             if (object.has("max_temp")) {
-                return Math.round((22f - 10f * (random.nextFloat() - 0.5f)) * 10f) / 10f;
-                //return object.getLong("max_temp");
+                if (randomize) {
+                    random = new Random(date.getTime());
+                    return Math.round((22f - 10f * (random.nextFloat() - 0.5f)) * 10f) / 10f;
+                } else {
+                    return object.getLong("max_temp");
+                }
             }
         } catch (JSONException e) {
             // Ignore. Too late to catch here.

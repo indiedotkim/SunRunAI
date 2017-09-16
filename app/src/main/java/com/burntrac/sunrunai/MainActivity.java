@@ -7,12 +7,14 @@ import java.util.TimeZone;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        WeatherWrapper.sContext = getApplicationContext();
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorGradientActivityStart, null)));
@@ -155,6 +159,28 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 View view = getLayoutInflater().inflate(R.layout.dialog_info, null);
+
+                final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean randomize = sharedPrefs.getBoolean(SettingsActivity.PREF_RANDOMIZE, SettingsActivity.DEFAULT_RANDOMIZE);
+
+                Switch randomizeSwitch = (Switch)view.findViewById(R.id.randomizeswitch);
+                randomizeSwitch.setChecked(randomize);
+                randomizeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        sharedPrefs.edit().putBoolean(SettingsActivity.PREF_RANDOMIZE, isChecked).commit();
+
+                        if (isChecked) {
+                            AI.getOptimizedPlan(getApplicationContext());
+
+                            mDayAdapter.notifyDataSetChanged();
+                        } else {
+                            AI.getOptimizedPlan(getApplicationContext());
+
+                            mDayAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+
                 builder.setView(view);
                 builder.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
                     @Override
