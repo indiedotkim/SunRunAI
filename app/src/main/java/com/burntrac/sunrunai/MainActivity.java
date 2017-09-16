@@ -58,10 +58,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-        ActionBar actionBar = getActionBar();
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorGradientActivityStart, null)));
-         */
 
         synchronized (CONTEXT) {
             if (sActivityHelper == null) {
@@ -79,8 +77,17 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     aiImage.setImageResource(R.drawable.ai);
+
+                    AI.getOptimizedPlan(getApplicationContext());
+                    AI.isActivated = true;
+
+                    mDayAdapter.notifyDataSetChanged();
                 } else {
                     aiImage.setImageResource(R.drawable.ai_grey);
+
+                    AI.isActivated = false;
+
+                    mDayAdapter.notifyDataSetChanged();
                 }
             }
         });

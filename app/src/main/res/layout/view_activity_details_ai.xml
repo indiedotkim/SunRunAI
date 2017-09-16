@@ -89,7 +89,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/startday"
+        android:id="@+id/deltadays"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -116,8 +116,8 @@
         android:text="Delta"
         android:textAlignment="center"
         android:textSize="10sp"
-        app:layout_constraintLeft_toLeftOf="@+id/startday"
-        app:layout_constraintTop_toBottomOf="@+id/startday" />
+        app:layout_constraintLeft_toLeftOf="@+id/deltadays"
+        app:layout_constraintTop_toBottomOf="@+id/deltadays" />
 
     <TextView
         android:id="@+id/tags"

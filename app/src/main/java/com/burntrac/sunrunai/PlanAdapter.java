@@ -96,6 +96,7 @@ public class PlanAdapter extends BaseAdapter {
             LinkedHashMap goal = ActivityHelper.findGoal(document);
 
             goal.put("selfreference", document);
+
             goals.add(goal);
         }
 

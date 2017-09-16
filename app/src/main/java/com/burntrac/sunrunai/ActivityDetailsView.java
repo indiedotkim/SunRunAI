@@ -138,10 +138,15 @@ public class ActivityDetailsView extends LinearLayout {
         } else if (mActivity != null) {
             try {
                 if (mPlanStart != null) {
+                    // Viewing a plan.
                     Date activityDate = new Date(mActivity.getLong("datetime"));
 
                     ((TextView) findViewById(R.id.date)).setText(DateHelper.formatDate(activityDate));
                     ((TextView) findViewById(R.id.dateordinal)).setText(DateHelper.formatDateSuffix(activityDate));
+                } else {
+                    // Inside day view.
+
+                    ((TextView) findViewById(R.id.deltadays)).setText(mActivity.get("sunrunai_change").toString());
                 }
             } catch (JSONException e) {
                 // No problem.

@@ -104,20 +104,60 @@ public class DayAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         DayView view;
+        int hardPosition = position;
 
         ArrayList activities;
 
         if (mStart != null && mEnd != null) {
+            int documentPosition = position;
+            int change = 0;
+            String reason = "";
+
+            if (AI.isActivated && AI.valuesValid) {
+                if (position > 0) {
+                    if (AI.swap.containsKey(position - 1)) {
+                        documentPosition = AI.swap.get(position - 1) + 1;
+                        change = position - documentPosition;
+                        reason = AI.reason.get(position - 1);
+
+                        position = documentPosition;
+                    } else if (AI.swapInv.containsKey(position - 1)) {
+                        documentPosition = AI.swapInv.get(position - 1) + 1;
+                        change = position - documentPosition;
+
+                        position = documentPosition;
+                    }
+                }
+            }
+
             Date viewStart = DateHelper.getNDaysAhead(mStart, position);
             Date viewEnd = DateHelper.getNDaysAhead(mStart, position + 1);
 
             activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd);
+
+            for (Object object : activities) {
+                JSONObject activity = (JSONObject)object;
+
+                try {
+                    activity.put("sunrunai_activated", AI.isActivated);
+                    activity.put("sunrunai_valid", AI.valuesValid);
+                    activity.put("sunrunai_change", change);
+                    activity.put("sunrunai_reason", reason);
+                } catch (JSONException e) {
+                    // Ignore.
+                }
+            }
         } else {
             activities = new ArrayList();
             //activities.add(ActivityHelper.createActivity());
         }
 
-        Date date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
+        Date date;
+        if (mStart != null && mEnd != null && AI.isActivated && AI.valuesValid) {
+            date = DateHelper.getNDaysAhead(mStart, hardPosition);
+        } else {
+            date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
+        }
 
         if (convertView == null) {
             view = new DayView(mContext, null, position, date, activities);

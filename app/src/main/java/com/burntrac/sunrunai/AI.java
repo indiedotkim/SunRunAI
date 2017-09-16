@@ -39,6 +39,7 @@ public class AI {
     public static HashMap<Integer, Integer> swapInv = new HashMap<Integer, Integer>();
     public static HashMap<Integer, String> reason = new HashMap<Integer, String>();
 
+    public static boolean isActivated = false;
     public static boolean valuesValid = false;
 
     private static int reschedule(int baseIndex, LinkedList<String> types, LinkedList<Integer> indices, LinkedList<Boolean> boolDays, String[] categories) {

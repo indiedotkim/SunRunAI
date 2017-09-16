@@ -294,6 +294,8 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static float getTemperatureMaxValue(Date date) {
+        random = new Random(date.getTime());
+
         JSONObject object = getObjectForDate(date, true);
 
         if (object == null) {
