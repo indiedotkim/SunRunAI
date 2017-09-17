@@ -40,7 +40,7 @@ public class PlanView extends LinearLayout {
 
     private Context mContext;
     private int mPosition;
-    private Date mDate = new Date();
+    private static Date sDate = new Date();
     private View mValue;
     private Document mPlan;
 
@@ -63,7 +63,7 @@ public class PlanView extends LinearLayout {
             previous.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mDate = DateHelper.getPreviousDay(mDate);
+                    sDate = DateHelper.getPreviousDay(sDate);
 
                     PlanView.this.setViewValues(true);
                 }
@@ -73,13 +73,15 @@ public class PlanView extends LinearLayout {
             next.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mDate = DateHelper.getNextDay(mDate);
+                    sDate = DateHelper.getNextDay(sDate);
 
                     PlanView.this.setViewValues(true);
                 }
             });
         } else {
             inflater.inflate(R.layout.view_plan, this, true);
+
+            sDate = new Date();
         }
 
         setViewValues();
@@ -108,10 +110,10 @@ public class PlanView extends LinearLayout {
 
             Calendar calendar = new GregorianCalendar();
 
-            calendar.setTime(mDate);
+            calendar.setTime(sDate);
             startDay.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
-            startOrdinal.setText(DateHelper.formatDateSuffix(mDate));
-            startRemainder.setText(dateFormat.format(mDate));
+            startOrdinal.setText(DateHelper.formatDateSuffix(sDate));
+            startRemainder.setText(dateFormat.format(sDate));
 
             if (updateDateOnly) {
                 return;
@@ -120,7 +122,7 @@ public class PlanView extends LinearLayout {
             GridView view = (GridView)findViewById(R.id.planactivitylist);
             JSONArray details = new JSONArray((Collection)mPlan.getField("details"));
 
-            mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, mDate);
+            mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, sDate);
 
             view.setAdapter(mActivityDetailsAdapter);
         }
@@ -155,8 +157,8 @@ public class PlanView extends LinearLayout {
         return mPlan;
     }
 
-    public Date getStartDate() {
-        return mDate;
+    public static Date getStartDate() {
+        return sDate;
     }
 
     public int getCalculatedHeight() {

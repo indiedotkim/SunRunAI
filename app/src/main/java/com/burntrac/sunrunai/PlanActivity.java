@@ -112,7 +112,7 @@ public class PlanActivity extends AppCompatActivity {
                 builder.setPositiveButton("Select", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Date planStart = ((PlanView)childView).getStartDate();
+                        Date planStart = PlanView.getStartDate();
 
                         for (Object object : (ArrayList)plan.getField("details")) {
                             LinkedHashMap detail = (LinkedHashMap)object;

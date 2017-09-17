@@ -5,6 +5,84 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/colorControlHighlight"
+        android:padding="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_0852_clipboard4_plus" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="@+id/imageView3"
+            app:layout_constraintTop_toBottomOf="@+id/imageView3"
+            app:srcCompat="@drawable/ai" />
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="fitStart"
+            app:layout_constraintLeft_toLeftOf="@+id/imageView4"
+            app:layout_constraintTop_toBottomOf="@+id/imageView4"
+            app:srcCompat="@drawable/example" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="8dp"
+            android:text="1. Select a training plan."
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView3" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="8dp"
+            android:text="2. Switch AI on/off."
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView4" />
+
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="36dp"
+            android:text="3. See your plan adapt."
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView5" />
+    </android.support.constraint.ConstraintLayout>
+
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
@@ -14,42 +92,27 @@
         android:layout_marginTop="8dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
-        android:text="Sun Run AI's Data-Policy"
+        android:text="Sun Run AI"
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.Material.Title"
         android:textSize="24dp"
         android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="260dp"
         android:layout_height="30dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:scaleType="fitCenter"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/burntrac_dark"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="10dp"
-        android:text="Running training plans are live updated from the fitness web-site burntrac.com."
-        app:layout_constraintHorizontal_bias="0.425"
-        app:layout_constraintLeft_toLeftOf="@+id/imageView"
-        app:layout_constraintRight_toRightOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3"
+        app:srcCompat="@drawable/burntrac_dark" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -58,28 +121,14 @@
         android:layout_column="0"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="32dp"
         android:layout_row="1"
         android:scaleType="fitCenter"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:srcCompat="@drawable/color_weatherchannel_0" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        app:srcCompat="@drawable/color_weatherchannel_0"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="10dp"
-        android:text="Current weather data as well as forecasts are gathered from The Weather Channel."
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.425"
-        app:layout_constraintLeft_toLeftOf="@+id/imageView2"
-        app:layout_constraintRight_toRightOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
 </android.support.constraint.ConstraintLayout>
