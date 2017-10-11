@@ -34,6 +34,7 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import im.delight.android.ddp.db.Document;
 import im.delight.android.ddp.db.memory.InMemoryDatabase;
@@ -427,10 +428,19 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     }
 
     private void updateMenuIcons() {
+        ImageView helperIcon = (ImageView)findViewById(R.id.helpericon);
+        TextView helperText = (TextView)findViewById(R.id.helpertext);
+
         if (sActivityHelper.hasScheduledActivities()) {
             mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_change);
+
+            helperIcon.setVisibility(View.GONE);
+            helperText.setVisibility(View.GONE);
         } else {
             mMenu.findItem(R.id.plans).setIcon(R.drawable.ic_0852_clipboard4_plus);
+
+            helperIcon.setVisibility(View.VISIBLE);
+            helperText.setVisibility(View.VISIBLE);
         }
     }
 

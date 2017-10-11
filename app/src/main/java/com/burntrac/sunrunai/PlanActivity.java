@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
-import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +36,7 @@ public class PlanActivity extends AppCompatActivity {
 
     private static int INITIAL_GOAL = 10;
     public static int userGoal = INITIAL_GOAL;
+    public static int userGoalDiff = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +55,16 @@ public class PlanActivity extends AppCompatActivity {
         //dialog.show();
 
         final TextView goalComposite = (TextView)findViewById(R.id.goalcomposite);
+        final TextView goalVariationComposite = (TextView)findViewById(R.id.goalvariationcomposite);
 
         SeekBar goalBar = (SeekBar)findViewById(R.id.goalbar);
         goalBar.setProgress(INITIAL_GOAL);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
         goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)goalBar.getProgress(), useMetric ? 2 : 3));
+        goalVariationComposite.setText("±3" + (useMetric ? "km" : "mi"));
 
         goalBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -71,7 +74,7 @@ public class PlanActivity extends AppCompatActivity {
 
                 goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)progress, useMetric ? 2 : 3));
 
-                userGoal = progress;
+                userGoal = (int)DistanceHelper.getMetric(progress, useMetric);
 
                 mPlanAdapter.notifyDataSetChanged();
             }
@@ -190,6 +193,11 @@ public class PlanActivity extends AppCompatActivity {
 
         TextView goalComposite = (TextView)findViewById(R.id.goalcomposite);
         goalComposite.setText(DistanceHelper.formatDistance(getApplicationContext(), (float)goalBar.getProgress(), !useMetric ? 2 : 3));
+
+        userGoal = (int)DistanceHelper.getMetric(goalBar.getProgress(), !useMetric);
+
+        TextView goalVariationComposite = (TextView)findViewById(R.id.goalvariationcomposite);
+        goalVariationComposite.setText("±3" + (!useMetric ? "km" : "mi"));
 
         mPlanAdapter.notifyDataSetChanged();
     }

@@ -35,4 +35,20 @@ public class DistanceHelper {
 
         return String.format("%.1f", distance) + type;
     }
+
+    public static float getMetric(float distance, boolean isMetric) {
+        if (!isMetric) {
+            return distance * 1.60934f;
+        }
+
+        return distance;
+    }
+
+    public static float getImperial(float distance, boolean isMetric) {
+        if (isMetric) {
+            return distance / 1.60934f;
+        }
+
+        return distance;
+    }
 }

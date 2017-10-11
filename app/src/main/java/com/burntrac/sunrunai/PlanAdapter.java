@@ -1,6 +1,8 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +46,9 @@ public class PlanAdapter extends BaseAdapter {
 
             return 0;
         }
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
 
         int count = 0;
         int retries = 50;
@@ -91,16 +96,21 @@ public class PlanAdapter extends BaseAdapter {
             return 0;
         }
 
+        final float metricGoal = PlanActivity.userGoal;
+        final float metricGoalDiff = useMetric ? PlanActivity.userGoalDiff : DistanceHelper.getMetric(PlanActivity.userGoalDiff, false);
         LinkedList<LinkedHashMap> goals = new LinkedList<>();
         for (Document document : documentArray) {
             LinkedHashMap goal = ActivityHelper.findGoal(document);
 
             goal.put("selfreference", document);
 
-            goals.add(goal);
+            if ((double)document.getField("competitiondistance") >= metricGoal - metricGoalDiff &&
+                (double)document.getField("competitiondistance") <= metricGoal + metricGoalDiff) {
+                goals.add(goal);
+            }
         }
 
-        final float metricGoal = PlanActivity.userGoal;
+        /*
         Comparator<LinkedHashMap> comparator = new Comparator<LinkedHashMap>() {
             @Override
             public int compare(LinkedHashMap left, LinkedHashMap right) {
@@ -115,13 +125,14 @@ public class PlanAdapter extends BaseAdapter {
         };
 
         Collections.sort(goals, comparator);
+        */
 
         mDocuments = new Document[goals.size()];
         for (int i = 0; i < mDocuments.length; i++) {
             mDocuments[i] = (Document)goals.get(i).get("selfreference");
         }
 
-        return count;
+        return goals.size();
     }
 
     @Override

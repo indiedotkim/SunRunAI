@@ -36,6 +36,7 @@ import im.delight.android.ddp.db.Document;
 
 public class PlanView extends LinearLayout {
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy");
+    private static final int AT_MOST = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.AT_MOST);
     private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
     private Context mContext;
@@ -164,7 +165,7 @@ public class PlanView extends LinearLayout {
     public int getCalculatedHeight() {
         int height = mActivityDetailsAdapter != null ? mActivityDetailsAdapter.getMeasuredHeight() : 0;
 
-        this.measure(UNBOUNDED, UNBOUNDED);
+        this.measure(AT_MOST, UNBOUNDED);
         height += this.getMeasuredHeight();
 
         return height;
