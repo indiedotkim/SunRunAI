@@ -27,6 +27,7 @@ import java.util.HashMap;
  */
 
 public class ActivityView extends LinearLayout {
+    private static final int AT_MOST = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.AT_MOST);
     private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
     private View mValue;
@@ -74,7 +75,7 @@ public class ActivityView extends LinearLayout {
     public int getCalculatedHeight() {
         int height; // Not needed here: = mActivityDetailsAdapter != null && mActivity != null ? mActivityDetailsAdapter.getMeasuredHeight() : 0;
 
-        this.measure(UNBOUNDED, UNBOUNDED);
+        this.measure(AT_MOST, UNBOUNDED);
         height = this.getMeasuredHeight();
 
         return height;

@@ -19,6 +19,7 @@ import java.util.HashMap;
  */
 
 public class ActivityDetailsAdapter extends BaseAdapter {
+    private static final int AT_MOST = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.AT_MOST);
     private static final int UNBOUNDED = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
     private Context mContext;
@@ -91,7 +92,7 @@ public class ActivityDetailsAdapter extends BaseAdapter {
         for (int position = 0; position < getCount(); position++) {
             View view = getView(position, null, null);
 
-            view.measure(UNBOUNDED, UNBOUNDED);
+            view.measure(AT_MOST, UNBOUNDED);
 
             height += view.getMeasuredHeight();
         }
