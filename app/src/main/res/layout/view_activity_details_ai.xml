@@ -14,7 +14,6 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="0dp"
         android:tint="@android:color/darker_gray"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -42,17 +41,16 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="2dp"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typelabel">
+        app:layout_constraintTop_toBottomOf="@+id/typelabel"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
 
         <TextView
             android:id="@+id/annotation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="0dp"
             android:text="annotation"
             android:textSize="12sp"
             android:textStyle="italic"
@@ -62,10 +60,25 @@
     </android.support.constraint.ConstraintLayout>
 
     <TextView
+        android:id="@+id/actualdiff"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorActualBackground"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        android:text="DONE"
+        android:textAlignment="center"
+        android:textColor="@color/colorActualText"
+        android:textSize="20sp"
+        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/activityicon" />
+
+    <TextView
         android:id="@+id/time"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="42dp"
         android:text="0:00:00"
         android:textAlignment="center"
@@ -78,7 +91,6 @@
         android:id="@+id/distance"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="2dp"
         android:text="42.2km"
         android:textAlignment="center"
@@ -102,13 +114,13 @@
         android:id="@+id/typelabel"
         android:layout_width="26dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:text="Type"
         android:textAlignment="center"
         android:textSize="10sp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/daylabel"
-        android:layout_marginTop="0dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:layout_marginStart="8dp" />
 
     <TextView
         android:id="@+id/daylabel"
@@ -124,7 +136,6 @@
         android:id="@+id/tags"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:layout_marginTop="2dp"
         android:text="tags tags tags"
         android:textAlignment="center"

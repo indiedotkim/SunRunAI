@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -103,6 +104,14 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         GridView gridview = (GridView)findViewById(R.id.daygridview);
         mDayAdapter = new DayAdapter(this, gridview.getContext());
         gridview.setAdapter(mDayAdapter);
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (view instanceof DayView) {
+                    ((DayView)view).showDialog();
+                }
+            }
+        });
 
         MeteorWrapper.meteor = new Meteor(this, PrivateConfig.socket, new InMemoryDatabase());
         //MeteorWrapper.meteor = new Meteor(this, "ws://192.168.1.106:3000/websocket", new InMemoryDatabase());

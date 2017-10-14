@@ -7,12 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.TextView;
 
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,20 +120,22 @@ public class ActivityHelper extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<JSONObject> getActivities() {
-        return getActivities(null, null);
+    public ArrayList<JSONObject> getActivities(boolean fetchActual) {
+        return getActivities(null, null, fetchActual);
     }
 
-    public synchronized ArrayList<JSONObject> getActivities(Date from, Date to) {
+    public synchronized ArrayList<JSONObject> getActivities(Date from, Date to, boolean fetchActual) {
         ArrayList<JSONObject> activities = new ArrayList<JSONObject>();
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor;
 
+        String actualConstraint = fetchActual ? "schedule == 0" : "schedule == 1";
+
         if (from != null && to != null) {
-            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE datetime >= " + from.getTime() + " AND datetime < " + to.getTime() + " ORDER BY datetime ASC;", null);
+            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE " + actualConstraint + " AND datetime >= " + from.getTime() + " AND datetime < " + to.getTime() + " ORDER BY datetime ASC;", null);
         } else {
-            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " ORDER BY datetime ASC;", null);
+            cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE " + actualConstraint + " ORDER BY datetime ASC;", null);
         }
 
         if (cursor.getCount() == 0) {
@@ -158,9 +163,37 @@ public class ActivityHelper extends SQLiteOpenHelper {
     }
 
     public synchronized long addActivity(Map activity) {
+        SQLiteDatabase db = null;
+        SQLiteDatabase rdb = getReadableDatabase();
+
+        String whereClause_ = "schedule == " + activity.get("schedule") + " AND datetime == " + activity.get("datetime");
+        String whereClause = " WHERE " + whereClause_ + ";";
+        Cursor cursor = rdb.rawQuery("SELECT json FROM " + TABLE_NAME + whereClause, null);
+
+        if (cursor.getCount() > 0) {
+            cursor.close();
+
+            db = getWritableDatabase();
+            db.delete(TABLE_NAME, whereClause_, new String[] {});
+        } else {
+            cursor.close();
+        }
+
+        ///
+
+        if (activity.containsKey("details")) {
+            ArrayList details = (ArrayList)activity.get("details");
+
+            if (details != null && details.size() == 1 && (float)((Map)details.get(0)).get("distance") == 0) {
+                return  0;
+            }
+        }
+
+        ///
+
         JSONObject object = new JSONObject(activity);
 
-        SQLiteDatabase db = getWritableDatabase();
+        db = db != null ? db : getWritableDatabase();
 
         ContentValues content = new ContentValues();
 
@@ -173,10 +206,68 @@ public class ActivityHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public static List jsonArrayToList(JSONArray array) {
+        if (array == null) {
+            return null;
+        }
+
+        ArrayList list = new ArrayList();
+        for (int index = 0; index < array.length(); index++) {
+            try {
+                Object object = array.get(index);
+
+                if (object instanceof JSONArray) {
+                    list.add(jsonArrayToList((JSONArray)object));
+                } else if (object instanceof JSONObject) {
+                    list.add(jsonObjectToMap((JSONObject)object));
+                } else {
+                    list.add(object);
+                }
+            }
+            catch (JSONException je) {
+                // Ignore.
+            }
+        }
+
+        return list;
+    }
+
+    public static Map jsonObjectToMap(JSONObject object) {
+        if (object == null) {
+            return null;
+        }
+
+        LinkedHashMap map = new LinkedHashMap();
+
+        Iterator<String> keyIterator = object.keys();
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+
+            try {
+                Object value = object.get(key);
+
+                if (value instanceof JSONArray) {
+                    map.put(key, jsonArrayToList((JSONArray)value));
+                } else if (value instanceof JSONObject) {
+                    map.put(key, jsonObjectToMap((JSONObject) value));
+                //} else if (key == "date" || key == "datetime") {
+                //    map.put(key, new Date((long)value));
+                } else {
+                    map.put(key, value);
+                }
+
+            } catch (JSONException e) {
+                // Ignore.
+            }
+        }
+
+        return map;
+    }
+
     public synchronized int deleteScheduledActivities() {
         SQLiteDatabase db = getWritableDatabase();
 
-        return db.delete(TABLE_NAME, "schedule = 1", new String[] {});
+        return db.delete(TABLE_NAME, "", new String[] {});
     }
 
     public synchronized void dropActivities() {
@@ -188,7 +279,7 @@ public class ActivityHelper extends SQLiteOpenHelper {
     public synchronized boolean hasScheduledActivities() {
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE schedule = " + Generic.SCHEDULE_PLANNED + ";", null);
+        Cursor cursor = db.rawQuery("SELECT json FROM " + TABLE_NAME + " WHERE schedule == " + Generic.SCHEDULE_PLANNED + ";", null);
 
         boolean hasRows = cursor.getCount() > 0;
 
@@ -225,5 +316,42 @@ public class ActivityHelper extends SQLiteOpenHelper {
         } else {
             return 0f;
         }
+    }
+
+    public static float getMetricDistance(JSONObject detail) {
+        if (detail != null && detail.has("distance") && detail.has("distancetype")) {
+            try {
+                float distance = Float.parseFloat(detail.get("distance").toString());
+                int distancetype = Integer.parseInt(detail.get("distancetype").toString());
+
+                if (distancetype == 3) {
+                    return distance * 1.60934f;
+                } else {
+                    return distance;
+                }
+            }
+            catch (JSONException je) {
+                return 0f;
+            }
+        } else {
+            return 0f;
+        }
+    }
+
+    public static float getDetailsDistanceSum(JSONArray details) {
+        float metricSum = 0;
+
+        for (int index = 0; index < details.length(); index++) {
+            try {
+                JSONObject detail = details.getJSONObject(index);
+
+                metricSum += getMetricDistance(detail);
+            }
+            catch (JSONException je) {
+                // Ignore. Assume 0.
+            }
+        }
+
+        return metricSum;
     }
 }

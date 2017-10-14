@@ -179,7 +179,7 @@ public class AI {
             temp = WeatherWrapper.getTemperatureMaxValue(from);
             rain = WeatherWrapper.getRainValue(to);
 
-            ArrayList<JSONObject> activities = MainActivity.sActivityHelper.getActivities(from, to);
+            ArrayList<JSONObject> activities = MainActivity.sActivityHelper.getActivities(from, to, false);
             // MainActivity.sActivityHelper.getActivities(from, to).get(0).getJSONArray("details").get(0)
             // MainActivity.sActivityHelper.getActivities(from, to).get(0).getJSONArray("details").get(0).getJSONArray("selectedSubgroups")
 

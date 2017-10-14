@@ -5,7 +5,8 @@
     android:id="@+id/daylayout"
     android:layout_width="92dp"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:descendantFocusability="blocksDescendants">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="0dp"
@@ -146,5 +147,18 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <TextView
+        android:id="@+id/dayactivitylistoverlay"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:clickable="true"
+        android:paddingBottom="16dp"
+        app:layout_constraintLeft_toLeftOf="@+id/dayactivitylist"
+        app:layout_constraintRight_toRightOf="@+id/dayactivitylist"
+        app:layout_constraintTop_toTopOf="@+id/dayactivitylist" />
 
 </android.support.constraint.ConstraintLayout>

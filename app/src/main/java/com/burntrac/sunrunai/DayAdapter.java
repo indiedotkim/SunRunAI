@@ -54,7 +54,7 @@ public class DayAdapter extends BaseAdapter {
         return collection == null ? 0 : collection.count();
         */
 
-        ArrayList<JSONObject> activities = MainActivity.sActivityHelper.getActivities();
+        ArrayList<JSONObject> activities = MainActivity.sActivityHelper.getActivities(false);
 
         Date today = DateHelper.getMidnight(new Date());
         Date today10 = DateHelper.getMidnight(DateHelper.getNDaysAhead(new Date(), 11));
@@ -82,7 +82,9 @@ public class DayAdapter extends BaseAdapter {
                 mStart = start;
                 mEnd = DateHelper.getMidnight(DateHelper.getNDaysAhead(end, 1));
 
-                return (int)daysInclRestDays;
+                int count =  (int)daysInclRestDays;
+
+                return count > 20 ? 20 : count;
             } catch (JSONException e) {
                 // Ignore. This would be a bug in the data model.
             }
@@ -107,6 +109,7 @@ public class DayAdapter extends BaseAdapter {
         int hardPosition = position;
 
         ArrayList activities;
+        ArrayList activitiesActual;
 
         if (mStart != null && mEnd != null) {
             int documentPosition = position;
@@ -133,7 +136,8 @@ public class DayAdapter extends BaseAdapter {
             Date viewStart = DateHelper.getNDaysAhead(mStart, position);
             Date viewEnd = DateHelper.getNDaysAhead(mStart, position + 1);
 
-            activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd);
+            activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, false);
+            activitiesActual = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, true);
 
             for (Object object : activities) {
                 JSONObject activity = (JSONObject)object;
@@ -143,12 +147,15 @@ public class DayAdapter extends BaseAdapter {
                     activity.put("sunrunai_valid", AI.valuesValid);
                     activity.put("sunrunai_change", change);
                     activity.put("sunrunai_reason", reason);
+
+                    activity.put("sunrunai_actual_size", activitiesActual != null ? activitiesActual.size() : 0);
                 } catch (JSONException e) {
                     // Ignore.
                 }
             }
         } else {
             activities = new ArrayList();
+            activitiesActual = new ArrayList();
             //activities.add(ActivityHelper.createActivity());
         }
 
@@ -160,13 +167,13 @@ public class DayAdapter extends BaseAdapter {
         }
 
         if (convertView == null) {
-            view = new DayView(mContext, null, position, date, activities);
+            view = new DayView(this, mContext, null, position, date, activities, activitiesActual);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
         } else {
             view = (DayView)convertView;
-            view.override(position, date, activities);
+            view.override(position, date, activities, activitiesActual);
 
             mItems.put(position, view);
         }

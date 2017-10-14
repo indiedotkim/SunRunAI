@@ -1,6 +1,7 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,11 +19,13 @@ import java.util.HashMap;
 public class ActivityAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<JSONObject> mActivities;
+    private ArrayList<JSONObject> mActivitiesActual;
     private HashMap<Integer, ActivityView> mItems;
 
-    public ActivityAdapter(Context context, ArrayList activities) {
+    public ActivityAdapter(Context context, ArrayList activities, ArrayList activitiesActual) {
         mContext = context;
         mActivities = activities;
+        mActivitiesActual = activitiesActual;
         mItems = new HashMap<Integer, ActivityView>();
     }
 
@@ -45,9 +48,10 @@ public class ActivityAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityView view;
         JSONObject activity = mActivities.size() > position ? mActivities.get(position) : null;
+        JSONObject activityActual = mActivitiesActual.size() > 0 ? mActivitiesActual.get(0) : null;
 
         if (convertView == null) {
-            view = new ActivityView(mContext, null, position, activity);
+            view = new ActivityView(mContext, null, position, activity, activityActual);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, view.getCalculatedHeight()));
 
             mItems.put(position, view);
@@ -55,7 +59,7 @@ public class ActivityAdapter extends BaseAdapter {
             view = (ActivityView)convertView;
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, view.getCalculatedHeight()));
 
-            view.override(position, activity);
+            view.override(position, activity, activityActual);
 
             mItems.put(position, view);
         }
@@ -75,6 +79,7 @@ public class ActivityAdapter extends BaseAdapter {
 
         for (ActivityView view : mItems.values()) {
             view.invalidate();
+            view.forceLayout();
         }
     }
 }

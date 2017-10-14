@@ -35,14 +35,16 @@ public class ActivityView extends LinearLayout {
 
     private int mPosition;
     private JSONObject mActivity;
+    private JSONObject mActivityActual;
 
     private ActivityDetailsAdapter mActivityDetailsAdapter;
 
-    public ActivityView(Context context, AttributeSet attrs, int position, JSONObject activity) {
+    public ActivityView(Context context, AttributeSet attrs, int position, JSONObject activity, JSONObject activityActual) {
         super(context, attrs);
 
         mPosition = position;
         mActivity = activity;
+        mActivityActual = activityActual;
 
         LayoutInflater inflater = (LayoutInflater)context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -58,9 +60,10 @@ public class ActivityView extends LinearLayout {
         setViewValues();
     }
 
-    public void override(int position, JSONObject activity) {
+    public void override(int position, JSONObject activity, JSONObject activityactual) {
         mPosition = position;
         mActivity = activity;
+        mActivityActual = activityactual;
 
         setViewValues();
     }
@@ -92,7 +95,7 @@ public class ActivityView extends LinearLayout {
             e.printStackTrace();
         }
 
-        mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, null, mActivity);
+        mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, null, mActivity, mActivityActual);
 
         view.setAdapter(mActivityDetailsAdapter);
     }

@@ -1,7 +1,9 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,19 +28,21 @@ public class ActivityDetailsView extends LinearLayout {
 
     private int mPosition;
     private JSONObject mActivity;
+    private JSONObject mActivityActual;
     private JSONObject mActivityDetails;
     private Date mPlanStart;
 
     public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart) {
-        this(context, attrs, position, activitydetails, planstart, null);
+        this(context, attrs, position, activitydetails, planstart, null, null);
     }
 
-    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart, JSONObject activity) {
+    public ActivityDetailsView(Context context, AttributeSet attrs, int position, JSONObject activitydetails, Date planstart, JSONObject activity, JSONObject activityActual) {
         super(context, attrs);
 
         mContext = context;
         mPosition = position;
         mActivity = activity;
+        mActivityActual = activityActual;
         mActivityDetails = activitydetails;
         mPlanStart = planstart;
 
@@ -49,15 +53,20 @@ public class ActivityDetailsView extends LinearLayout {
             inflater.inflate(R.layout.view_activity_details, this, true);
         } else {
             inflater.inflate(R.layout.view_activity_details_ai, this, true);
+
+            TextView actualDiff = (TextView)findViewById(R.id.actualdiff);
+            Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/FasterOne-Regular.ttf");
+            actualDiff.setTypeface(typeface);
         }
 
         setViewValues();
     }
 
-    public void override(int position, JSONObject activity, Date planstart) {
+    public void override(int position, JSONObject activity, Date planstart, JSONObject activityactual) {
         mPosition = position;
         mActivityDetails = activity;
         mPlanStart = planstart;
+        mActivityActual = activityactual;
 
         setViewValues();
     }
@@ -120,6 +129,40 @@ public class ActivityDetailsView extends LinearLayout {
                 day.setText(dayValue);
             } catch (JSONException e) {
                 // No problem.
+            }
+        }
+
+
+        if (mPlanStart == null) {
+            TextView actualDiff = (TextView)findViewById(R.id.actualdiff);
+
+            if (mActivityActual != null) {
+                actualDiff.setVisibility(VISIBLE);
+
+                try {
+                    JSONArray details = mActivityActual.getJSONArray("details");
+                    float distanceActual = ActivityHelper.getDetailsDistanceSum(details);
+
+                    float distance = 0;
+                    if (mActivity != null && mActivity.has("details")) {
+                        details = mActivity.getJSONArray("details");
+                        distance = ActivityHelper.getDetailsDistanceSum(details);
+                    }
+
+                    if (Math.abs(distanceActual - distance) > 0.1) {
+                        if (distanceActual > distance) {
+                            actualDiff.setText("+" + String.format("%.0f", distanceActual - distance));
+                        } else {
+                            actualDiff.setText("−" + String.format("%.0f", distance - distanceActual)); // Minus sign from Fontbook.
+                        }
+                    } else {
+                        actualDiff.setText("DONE");
+                    }
+                } catch (JSONException e) {
+                    // Ignore.
+                }
+            } else {
+                actualDiff.setVisibility(INVISIBLE);
             }
         }
 

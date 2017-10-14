@@ -1,37 +1,59 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import im.delight.android.ddp.db.Document;
 
 /**
  * Created by kim on 8/29/17.
  */
 
 public class DayView extends LinearLayout {
+    DayAdapter mDayAdapter;
+    private Context mContext;
     private int mPosition;
     private Date mDate;
     private View mValue;
     private ImageView mImage;
     private ArrayList mActivities;
+    private ArrayList mActivitiesActual;
 
     private ActivityAdapter mActivityAdapter;
 
-    public DayView(Context context, AttributeSet attrs, int position, Date date, ArrayList activities) {
+    public DayView(DayAdapter dayAdapter, Context context, AttributeSet attrs, int position, Date date, ArrayList activities, ArrayList activitiesActual) {
         super(context, attrs);
 
+        mDayAdapter = dayAdapter;
+        mContext = context;
         mPosition = position;
         mDate = date;
         mActivities = activities;
+        mActivitiesActual = activitiesActual;
 
         /*
         setOrientation(LinearLayout.HORIZONTAL);
@@ -50,13 +72,127 @@ public class DayView extends LinearLayout {
 
         //mImage = (ImageView) getChildAt(2);
 
+        final DayView self = this;
+        TextView dayActivityListOverlay = (TextView)findViewById(R.id.dayactivitylistoverlay);
+        dayActivityListOverlay.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                self.showDialog();
+            }
+        });
+
         setViewValues();
     }
 
-    public void override(int position, Date date, ArrayList activities) {
+    public void setActualDistance(View view) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
+        SeekBar distanceBar = (SeekBar)view.findViewById(R.id.dayactualslider);
+
+        TextView dayActualDistance = (TextView)view.findViewById(R.id.dayactualdistance);
+        float distance = (float)distanceBar.getProgress();
+        if (distance > 0) {
+            dayActualDistance.setText(DistanceHelper.formatDistance(mContext, distance, useMetric ? 2 : 3));
+        } else {
+            dayActualDistance.setText("none");
+        }
+    }
+
+    public void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        final View view = ((LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_day, null);
+
+        TextView dialogDayHeader = (TextView)view.findViewById(R.id.dialogdayheader);
+        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/FasterOne-Regular.ttf");
+        dialogDayHeader.setTypeface(typeface);
+
+        TextView dayPlannedDistance = (TextView)view.findViewById(R.id.dayplanneddistance);
+        if (mActivities != null &&
+            mActivities.size() > 0 &&
+                ((JSONObject)mActivities.get(0)).has("details")) {
+            float metricDistance = 0;
+
+            try {
+                metricDistance = ActivityHelper.getDetailsDistanceSum(((JSONObject)mActivities.get(0)).getJSONArray("details"));
+            } catch (Exception e) {
+                // Too late...
+            }
+
+            dayPlannedDistance.setText(DistanceHelper.formatDistance(mContext, metricDistance, 2));
+        } else {
+            dayPlannedDistance.setText("none");
+        }
+
+        setActualDistance(view);
+
+        final DayView self = this;
+        final SeekBar distanceBar = (SeekBar)view.findViewById(R.id.dayactualslider);
+        distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                self.setActualDistance(view);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        builder.setView(view);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
+                HashMap detail = new HashMap();
+                ArrayList details = ActivityHelper.createActivityDetails(new ArrayList[] {},
+                0,
+                0,
+                0,
+                4,
+                        (float)distanceBar.getProgress(),
+                useMetric ? 2 : 3);
+                JSONObject activity = ActivityHelper.createActivity("Achievement", null, mDate, 0,
+                        details);
+
+                Map activityMap = ActivityHelper.jsonObjectToMap(activity);
+                MainActivity.sActivityHelper.addActivity(activityMap);
+
+                mDayAdapter.notifyDataSetChanged();
+                mActivityAdapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //Intent i = new Intent(getApplicationContext(), PlanActivity.class);
+                //startActivity(i);
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void override(int position, Date date, ArrayList activities, ArrayList activitiesActual) {
         mPosition = position;
         mDate = date;
         mActivities = activities;
+        mActivitiesActual = activitiesActual;
 
         setViewValues();
     }
@@ -96,7 +232,7 @@ public class DayView extends LinearLayout {
         ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed(mDate));
 
         GridView gridview = (GridView)findViewById(R.id.dayactivitylist);
-        mActivityAdapter = new ActivityAdapter(gridview.getContext(), mActivities);
+        mActivityAdapter = new ActivityAdapter(gridview.getContext(), mActivities, mActivitiesActual);
         gridview.setAdapter(mActivityAdapter);
     }
 

@@ -15,4 +15,7 @@
     <!-- *** -->
     <color name="colorGradientActivityStart">#00aaf2</color>
     <color name="colorGradientActivityEnd">#ffffff</color>
+    <!-- *** -->
+    <color name="colorActualText">#0086be</color>
+    <color name="colorActualBackground">#c0ffffff</color>
 </resources>

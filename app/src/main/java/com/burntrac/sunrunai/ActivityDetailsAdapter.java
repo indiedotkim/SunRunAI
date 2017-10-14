@@ -25,18 +25,20 @@ public class ActivityDetailsAdapter extends BaseAdapter {
     private Context mContext;
     private int mPosition;
     private JSONObject mActivity;
+    private JSONObject mActivityActual;
     private JSONArray mActivities;
     private HashMap<Integer, ActivityDetailsView> mItems;
     private Date mPlanStart;
 
     public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart) {
-        this(context, position, activities, planstart, null);
+        this(context, position, activities, planstart, null, null);
     }
 
-    public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart, JSONObject activity) {
+    public ActivityDetailsAdapter(Context context, int position, JSONArray activities, Date planstart, JSONObject activity, JSONObject activityActual) {
         mContext = context;
         mPosition = position;
         mActivity = activity;
+        mActivityActual = activityActual;
         mActivities = activities == null ? new JSONArray() : activities;
         mItems = new HashMap<Integer, ActivityDetailsView>();
         mPlanStart = planstart;
@@ -61,6 +63,7 @@ public class ActivityDetailsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ActivityDetailsView view;
         JSONObject details = null;
+
         try {
             details = mActivities.length() > position ? mActivities.getJSONObject(position) : null;
         } catch (JSONException e) {
@@ -68,7 +71,7 @@ public class ActivityDetailsAdapter extends BaseAdapter {
         }
 
         if (convertView == null) {
-            view = new ActivityDetailsView(mContext, null, position, details, mPlanStart, mActivity);
+            view = new ActivityDetailsView(mContext, null, position, details, mPlanStart, mActivity, mActivityActual);
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             mItems.put(position, view);
@@ -76,7 +79,7 @@ public class ActivityDetailsAdapter extends BaseAdapter {
             view = (ActivityDetailsView)convertView;
             view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            view.override(position, details, mPlanStart);
+            view.override(position, details, mPlanStart, mActivityActual);
 
             mItems.put(position, view);
         }
@@ -106,6 +109,7 @@ public class ActivityDetailsAdapter extends BaseAdapter {
 
         for (ActivityDetailsView view : mItems.values()) {
             view.invalidate();
+            view.forceLayout();
         }
     }
 }
