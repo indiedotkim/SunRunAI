@@ -87,6 +87,17 @@ public class ActivityDetailsView extends LinearLayout {
             return;
         }
 
+        if (mPlanStart == null) {
+            findViewById(R.id.annotation).setVisibility(VISIBLE);
+            findViewById(R.id.typeicon).setVisibility(VISIBLE);
+            findViewById(R.id.time).setVisibility(VISIBLE);
+            findViewById(R.id.distance).setVisibility(VISIBLE);
+            findViewById(R.id.deltadays).setVisibility(VISIBLE);
+            findViewById(R.id.daylabel).setVisibility(VISIBLE);
+            findViewById(R.id.typelabel).setVisibility(VISIBLE);
+            findViewById(R.id.tags).setVisibility(VISIBLE);
+        }
+
         String cssIcon = (String)MeteorWrapper.findKVMatch("activitytypes", "activityno", kind, "icon");
         ImageView icon = (ImageView)findViewById(R.id.activityicon);
         if (cssIcon != null) {
@@ -132,7 +143,6 @@ public class ActivityDetailsView extends LinearLayout {
             }
         }
 
-
         if (mPlanStart == null) {
             TextView actualDiff = (TextView)findViewById(R.id.actualdiff);
 
@@ -144,9 +154,11 @@ public class ActivityDetailsView extends LinearLayout {
                     float distanceActual = ActivityHelper.getDetailsDistanceSum(details);
 
                     float distance = 0;
+                    int distancetype = 2;
                     if (mActivity != null && mActivity.has("details")) {
                         details = mActivity.getJSONArray("details");
                         distance = ActivityHelper.getDetailsDistanceSum(details);
+                        distancetype = ((JSONObject)details.get(0)).getInt("distancetype");
                     }
 
                     if (Math.abs(distanceActual - distance) > 0.1) {
@@ -156,7 +168,20 @@ public class ActivityDetailsView extends LinearLayout {
                             actualDiff.setText("−" + String.format("%.0f", distance - distanceActual)); // Minus sign from Fontbook.
                         }
                     } else {
-                        actualDiff.setText("DONE");
+                        if (mActivity.getBoolean("sunrunai_restday")) {
+                            actualDiff.setText(DistanceHelper.formatDistance(mContext, distance, distancetype, true));
+
+                            findViewById(R.id.annotation).setVisibility(INVISIBLE);
+                            findViewById(R.id.typeicon).setVisibility(INVISIBLE);
+                            findViewById(R.id.time).setVisibility(INVISIBLE);
+                            findViewById(R.id.distance).setVisibility(INVISIBLE);
+                            findViewById(R.id.deltadays).setVisibility(INVISIBLE);
+                            findViewById(R.id.daylabel).setVisibility(INVISIBLE);
+                            findViewById(R.id.typelabel).setVisibility(INVISIBLE);
+                            findViewById(R.id.tags).setVisibility(INVISIBLE);
+                        } else {
+                            actualDiff.setText("DONE");
+                        }
                     }
                 } catch (JSONException e) {
                     // Ignore.

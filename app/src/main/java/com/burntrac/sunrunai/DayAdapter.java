@@ -93,7 +93,7 @@ public class DayAdapter extends BaseAdapter {
         mStart = today;
         mEnd = DateHelper.getMidnight(DateHelper.getNDaysAhead(today10, 1));
 
-        return WeatherWrapper.getDaysWithDataAvailable();
+        return 0;
     }
 
     public Object getItem(int position) {
@@ -139,6 +139,11 @@ public class DayAdapter extends BaseAdapter {
             activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, false);
             activitiesActual = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, true);
 
+            boolean isRestDay = false;
+            if (activities.size() == 0 && activitiesActual.size() > 0) {
+                activities = activitiesActual;
+                isRestDay = true;
+            }
             for (Object object : activities) {
                 JSONObject activity = (JSONObject)object;
 
@@ -148,7 +153,9 @@ public class DayAdapter extends BaseAdapter {
                     activity.put("sunrunai_change", change);
                     activity.put("sunrunai_reason", reason);
 
-                    activity.put("sunrunai_actual_size", activitiesActual != null ? activitiesActual.size() : 0);
+                    activity.put("sunrunai_restday", isRestDay);
+
+                    //activity.put("sunrunai_actual_size", activitiesActual != null ? activitiesActual.size() : 0);
                 } catch (JSONException e) {
                     // Ignore.
                 }
@@ -160,11 +167,11 @@ public class DayAdapter extends BaseAdapter {
         }
 
         Date date;
-        if (mStart != null && mEnd != null && AI.isActivated && AI.valuesValid) {
+        //if (mStart != null && mEnd != null && AI.isActivated && AI.valuesValid) {
             date = DateHelper.getNDaysAhead(mStart, hardPosition);
-        } else {
-            date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
-        }
+        //} else {
+        //    date = DateHelper.getNDaysAhead(DateHelper.getMidnight(new Date()), position);
+        //}
 
         if (convertView == null) {
             view = new DayView(this, mContext, null, position, date, activities, activitiesActual);
@@ -191,6 +198,8 @@ public class DayAdapter extends BaseAdapter {
             view.invalidate();
             view.forceLayout();
         }
+
+        calculateTrophies();
     }
 
     public Date getStartDate() {
@@ -201,5 +210,36 @@ public class DayAdapter extends BaseAdapter {
         }
 
         return earliest;
+    }
+
+    private void calculateTrophies() {
+        if (mStart == null || mEnd == null) {
+            return;
+        }
+
+        if (AI.isActivated && !AI.valuesValid) {
+            return;
+        }
+
+        int totalPlanned = 0;
+        int withActual = 0;
+
+        for (int position = 0; position <= (mEnd.getTime() - mStart.getTime()) / (24 * 60 * 60 * 1000); position++) {
+            Date viewStart = DateHelper.getNDaysAhead(mStart, position);
+            Date viewEnd = DateHelper.getNDaysAhead(mStart, position + 1);
+
+            ArrayList activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, false);
+            ArrayList activitiesActual = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, true);
+
+            if (activities != null && activities.size() > 0) {
+                totalPlanned++;
+            }
+
+            if (activitiesActual != null && activitiesActual.size() > 0) {
+                withActual++;
+            }
+        }
+
+        mMain.setTrophies(totalPlanned, withActual);
     }
 }

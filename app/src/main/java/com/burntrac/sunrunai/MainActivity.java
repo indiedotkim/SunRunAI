@@ -476,4 +476,14 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             mDayAdapter.notifyDataSetChanged();
         }
     }
+
+    public void setTrophies(int totalPlanned, int withActual) {
+        TextView trophyText3 = (TextView)findViewById(R.id.trophytext3);
+
+        if (totalPlanned > 0) {
+            trophyText3.setText("" + String.format("%.0f", Math.ceil((float) withActual / (float) totalPlanned * 100)) + "%");
+        } else {
+            trophyText3.setText("0%");
+        }
+    }
 }

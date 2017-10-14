@@ -10,6 +10,10 @@ import android.preference.PreferenceManager;
 
 public class DistanceHelper {
     public static String formatDistance(Context context, float distance, int distancetype) {
+        return formatDistance(context, distance, distancetype, false);
+    }
+
+    public static String formatDistance(Context context, float distance, int distancetype, boolean noDecimals) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
 
@@ -33,7 +37,11 @@ public class DistanceHelper {
             type = "ft";
         }
 
-        return String.format("%.1f", distance) + type;
+        if (noDecimals) {
+            return String.format("%.0f", distance) + type;
+        } else {
+            return String.format("%.1f", distance) + type;
+        }
     }
 
     public static float getMetric(float distance, boolean isMetric) {

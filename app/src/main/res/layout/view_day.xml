@@ -9,6 +9,7 @@
     android:descendantFocusability="blocksDescendants">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/daygradient"
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:background="@drawable/gradient_activity"

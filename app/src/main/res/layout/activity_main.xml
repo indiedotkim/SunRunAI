@@ -176,12 +176,14 @@
         android:contentDescription="Turn artificial intelligence "
         android:onClick="switchViaImage"
         android:scaleType="fitCenter"
+        android:tint="@android:color/holo_green_dark"
+        android:tintMode="multiply"
         android:translationY="-97dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/toolbar"
         app:layout_constraintRight_toRightOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:srcCompat="@drawable/trophy_banner" />
+        app:srcCompat="@drawable/trophy_medal" />
 
     <TextView
         android:id="@+id/trophytext1"
@@ -195,6 +197,7 @@
         android:scaleType="fitCenter"
         android:text="+T1"
         android:textAlignment="center"
+        android:textColor="@color/colorCardPlanned"
         android:textSize="18sp"
         android:textStyle="bold"
         android:translationY="-97dp"
@@ -214,12 +217,14 @@
         android:contentDescription="Turn artificial intelligence "
         android:onClick="switchViaImage"
         android:scaleType="fitCenter"
+        android:tint="@android:color/holo_orange_dark"
+        android:tintMode="multiply"
         android:translationY="-97dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/toolbar"
         app:layout_constraintRight_toRightOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:srcCompat="@drawable/trophy_banner" />
+        app:srcCompat="@drawable/trophy_honors" />
 
     <TextView
         android:id="@+id/trophytext2"
@@ -233,6 +238,7 @@
         android:scaleType="fitCenter"
         android:text="+T2"
         android:textAlignment="center"
+        android:textColor="@color/colorCardPlanned"
         android:textSize="18sp"
         android:textStyle="bold"
         android:translationY="-97dp"
@@ -252,12 +258,14 @@
         android:contentDescription="Turn artificial intelligence "
         android:onClick="switchViaImage"
         android:scaleType="fitCenter"
+        android:tint="@android:color/holo_red_light"
+        android:tintMode="multiply"
         android:translationY="-97dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/toolbar"
         app:layout_constraintRight_toRightOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:srcCompat="@drawable/trophy_banner" />
+        app:srcCompat="@drawable/trophy_laurels" />
 
     <TextView
         android:id="@+id/trophytext3"
@@ -269,8 +277,9 @@
         android:contentDescription="Turn artificial intelligence "
         android:onClick="switchViaImage"
         android:scaleType="fitCenter"
-        android:text="+T3"
+        android:text="99"
         android:textAlignment="center"
+        android:textColor="@color/colorCardPlanned"
         android:textSize="18sp"
         android:textStyle="bold"
         android:translationY="-97dp"
@@ -295,6 +304,6 @@
         app:layout_constraintLeft_toLeftOf="@+id/toolbar"
         app:layout_constraintRight_toRightOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:srcCompat="@drawable/trophy_banner" />
+        app:srcCompat="@drawable/trophy_king" />
 
 </android.support.constraint.ConstraintLayout>

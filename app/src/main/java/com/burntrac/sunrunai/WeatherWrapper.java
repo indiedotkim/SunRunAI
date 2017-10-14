@@ -268,7 +268,7 @@ public class WeatherWrapper extends ResultReceiver {
             }
 
             if (details.has("temp")) {
-                return getTemperatureValue(date) + getTemperatureUnit();
+                return String.format("%.0f", getTemperatureValue(date)) + getTemperatureUnit();
             }
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
@@ -286,7 +286,7 @@ public class WeatherWrapper extends ResultReceiver {
 
         try {
             if (object.has("min_temp")) {
-                return object.getString("min_temp") + getTemperatureUnit();
+                return String.format("%.0f", (float)object.getDouble("min_temp")) + getTemperatureUnit();
             }
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
@@ -329,7 +329,7 @@ public class WeatherWrapper extends ResultReceiver {
         }
 
         if (object.has("max_temp")) {
-            return getTemperatureMaxValue(date) + getTemperatureUnit();
+            return String.format("%.0f", (float)getTemperatureMaxValue(date)) + getTemperatureUnit();
         }
 
         return "-";

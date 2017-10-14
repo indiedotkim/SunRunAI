@@ -14,8 +14,10 @@
     <color name="colorCardWorkout">#ffe9a1</color>
     <!-- *** -->
     <color name="colorGradientActivityStart">#00aaf2</color>
+    <color name="colorGradientActivityStartToday">#ff6034</color>
+    <color name="colorGradientActivityStartPast">#b4e9ff</color>
     <color name="colorGradientActivityEnd">#ffffff</color>
     <!-- *** -->
-    <color name="colorActualText">#0086be</color>
-    <color name="colorActualBackground">#c0ffffff</color>
+    <color name="colorActualText">#ffe100</color>
+    <color name="colorActualBackground">#c0454545</color>
 </resources>

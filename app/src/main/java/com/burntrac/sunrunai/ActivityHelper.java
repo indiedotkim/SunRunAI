@@ -182,10 +182,20 @@ public class ActivityHelper extends SQLiteOpenHelper {
         ///
 
         if (activity.containsKey("details")) {
-            ArrayList details = (ArrayList)activity.get("details");
+            List details = (List)activity.get("details");
 
-            if (details != null && details.size() == 1 && (float)((Map)details.get(0)).get("distance") == 0) {
-                return  0;
+            if (details != null && details.size() == 1) {
+                Object distance = ((Map)details.get(0)).get("distance");
+
+                if (distance instanceof Double && (double)distance == 0) {
+                    return  0;
+                } else if (distance instanceof Float && (float)distance == 0) {
+                    return  0;
+                } else if (distance instanceof Integer && (int)distance == 0) {
+                    return  0;
+                } else if (distance instanceof Long && (long)distance == 0) {
+                    return  0;
+                }
             }
         }
 

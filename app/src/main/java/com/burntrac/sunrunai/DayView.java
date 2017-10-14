@@ -3,9 +3,11 @@ package com.burntrac.sunrunai;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -60,8 +62,7 @@ public class DayView extends LinearLayout {
         setGravity(Gravity.CENTER_VERTICAL);
          */
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_day, this, true);
 
         //TextView title = (TextView)getChildAt(0);
@@ -205,6 +206,16 @@ public class DayView extends LinearLayout {
             this.setBackgroundColor(Color.rgb(0xc2, 0xd7, 0xef));
         }
         */
+
+        ConstraintLayout dayGradient = (ConstraintLayout)findViewById(R.id.daygradient);
+        int gradientId = ResourceResolver.getIdentifierForDrawable(mContext, "gradient_activity_today");
+        String gradientName = "gradient_activity";
+        if (mDate.getTime() == DateHelper.getMidnight(new Date()).getTime()) {
+            gradientName = "gradient_activity_today";
+        } else if (mDate.getTime() < DateHelper.getMidnight(new Date()).getTime()) {
+            gradientName = "gradient_activity_past";
+        }
+        dayGradient.setBackground(mContext.getResources().getDrawable(ResourceResolver.getIdentifierForDrawable(mContext, gradientName), null));
 
         ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(mDate));
         ((TextView)findViewById(R.id.datesuffix)).setText(DateHelper.formatDateSuffix(mDate));
