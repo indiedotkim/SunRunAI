@@ -47,6 +47,19 @@ public class DayView extends LinearLayout {
 
     private ActivityAdapter mActivityAdapter;
 
+    private GridView mViewDayActivityList;
+    private ConstraintLayout mLayoutDayGradient;
+    private TextView mViewDate;
+    private TextView mViewDateSuffix;
+    private TextView mViewTemperature;
+    private TextView mViewTemperatureHi;
+    private TextView mViewTemperatureLo;
+    private TextView mViewTemperatureMin;
+    private TextView mViewRain;
+    private TextView mViewWindDirection;
+    private TextView mViewWindSpeed;
+    private TextView mViewDayActivityListOverlay;
+
     public DayView(DayAdapter dayAdapter, Context context, AttributeSet attrs, int position, Date date, ArrayList activities, ArrayList activitiesActual) {
         super(context, attrs);
 
@@ -73,9 +86,23 @@ public class DayView extends LinearLayout {
 
         //mImage = (ImageView) getChildAt(2);
 
+        mLayoutDayGradient = (ConstraintLayout)findViewById(R.id.daygradient);
+
+        mViewDayActivityList = (GridView)findViewById(R.id.dayactivitylist);
+
+        mViewDate = findViewById(R.id.date);
+        mViewDateSuffix = findViewById(R.id.datesuffix);
+        mViewTemperature = findViewById(R.id.temperature);
+        mViewTemperatureHi = findViewById(R.id.temperaturehi);
+        mViewTemperatureLo = findViewById(R.id.temperaturelo);
+        mViewTemperatureMin = findViewById(R.id.temperaturemin);
+        mViewRain = findViewById(R.id.rain);
+        mViewWindDirection = findViewById(R.id.winddirection);
+        mViewWindSpeed = findViewById(R.id.windspeed);
+        mViewDayActivityListOverlay = findViewById(R.id.dayactivitylistoverlay);
+
         final DayView self = this;
-        TextView dayActivityListOverlay = (TextView)findViewById(R.id.dayactivitylistoverlay);
-        dayActivityListOverlay.setOnClickListener(new OnClickListener() {
+        mViewDayActivityListOverlay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 self.showDialog();
@@ -105,8 +132,7 @@ public class DayView extends LinearLayout {
         final View view = ((LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_day, null);
 
         TextView dialogDayHeader = (TextView)view.findViewById(R.id.dialogdayheader);
-        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/FasterOne-Regular.ttf");
-        dialogDayHeader.setTypeface(typeface);
+        dialogDayHeader.setTypeface(MainActivity.sSpeedFont);
 
         TextView dayPlannedDistance = (TextView)view.findViewById(R.id.dayplanneddistance);
         if (mActivities != null &&
@@ -160,14 +186,13 @@ public class DayView extends LinearLayout {
 
                 HashMap detail = new HashMap();
                 ArrayList details = ActivityHelper.createActivityDetails(new ArrayList[] {},
-                0,
-                0,
-                0,
-                4,
-                        (float)distanceBar.getProgress(),
-                useMetric ? 2 : 3);
-                JSONObject activity = ActivityHelper.createActivity("Achievement", null, mDate, 0,
-                        details);
+                                                                         0,
+                                                                         0,
+                                                                         0,
+                                                                         4,
+                                                                         (float)distanceBar.getProgress(),
+                                                                         useMetric ? 2 : 3);
+                JSONObject activity = ActivityHelper.createActivity("Achievement", null, mDate, 0, details);
 
                 Map activityMap = ActivityHelper.jsonObjectToMap(activity);
                 MainActivity.sActivityHelper.addActivity(activityMap);
@@ -207,7 +232,6 @@ public class DayView extends LinearLayout {
         }
         */
 
-        ConstraintLayout dayGradient = (ConstraintLayout)findViewById(R.id.daygradient);
         int gradientId = ResourceResolver.getIdentifierForDrawable(mContext, "gradient_activity_today");
         String gradientName = "gradient_activity";
         if (mDate.getTime() == DateHelper.getMidnight(new Date()).getTime()) {
@@ -215,36 +239,35 @@ public class DayView extends LinearLayout {
         } else if (mDate.getTime() < DateHelper.getMidnight(new Date()).getTime()) {
             gradientName = "gradient_activity_past";
         }
-        dayGradient.setBackground(mContext.getResources().getDrawable(ResourceResolver.getIdentifierForDrawable(mContext, gradientName), null));
+        mLayoutDayGradient.setBackground(mContext.getResources().getDrawable(ResourceResolver.getIdentifierForDrawable(mContext, gradientName), null));
 
-        ((TextView)findViewById(R.id.date)).setText(DateHelper.formatDate(mDate));
-        ((TextView)findViewById(R.id.datesuffix)).setText(DateHelper.formatDateSuffix(mDate));
+        mViewDate.setText(DateHelper.formatDate(mDate));
+        mViewDateSuffix.setText(DateHelper.formatDateSuffix(mDate));
 
-        ((TextView)findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperature(mDate));
+        mViewTemperature.setText(WeatherWrapper.getTemperature(mDate));
 
         String maxTemp = WeatherWrapper.getTemperatureMax(mDate);
         if (maxTemp != null && maxTemp.length() > 0) {
-            ((TextView) findViewById(R.id.temperature)).setText(WeatherWrapper.getTemperatureMax(mDate));
+            mViewTemperature.setText(WeatherWrapper.getTemperatureMax(mDate));
         }
 
         String tempMin = WeatherWrapper.getTemperatureMin(mDate);
         if (tempMin == null || tempMin.length() == 0) {
-            ((TextView)findViewById(R.id.temperaturemin)).setText("");
-            ((TextView)findViewById(R.id.temperaturehi)).setText("Temperature");
-            ((TextView)findViewById(R.id.temperaturelo)).setText("");
+            mViewTemperatureMin.setText("");
+            mViewTemperatureHi.setText("Temperature");
+            mViewTemperatureLo.setText("");
         } else {
-            ((TextView)findViewById(R.id.temperaturemin)).setText(WeatherWrapper.getTemperatureMin(mDate));
-            ((TextView)findViewById(R.id.temperaturehi)).setText("Hi");
-            ((TextView)findViewById(R.id.temperaturelo)).setText("Lo");
+            mViewTemperatureMin.setText(WeatherWrapper.getTemperatureMin(mDate));
+            mViewTemperatureHi.setText("Hi");
+            mViewTemperatureLo.setText("Lo");
         }
 
-        ((TextView)findViewById(R.id.rain)).setText(WeatherWrapper.getRain(mDate));
-        ((TextView)findViewById(R.id.winddirection)).setText(WeatherWrapper.getWindDirection(mDate));
-        ((TextView)findViewById(R.id.windspeed)).setText(WeatherWrapper.getWindSpeed(mDate));
+        mViewRain.setText(WeatherWrapper.getRain(mDate));
+        mViewWindDirection.setText(WeatherWrapper.getWindDirection(mDate));
+        mViewWindSpeed.setText(WeatherWrapper.getWindSpeed(mDate));
 
-        GridView gridview = (GridView)findViewById(R.id.dayactivitylist);
-        mActivityAdapter = new ActivityAdapter(gridview.getContext(), mActivities, mActivitiesActual);
-        gridview.setAdapter(mActivityAdapter);
+        mActivityAdapter = new ActivityAdapter(mViewDayActivityList.getContext(), mActivities, mActivitiesActual);
+        mViewDayActivityList.setAdapter(mActivityAdapter);
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private Menu mMenu;
 
     public static ActivityHelper sActivityHelper;
+    public static Typeface sSpeedFont;
+
     private DayAdapter mDayAdapter;
 
     private String activityId;
@@ -77,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
                 //sActivityHelper.deleteScheduledActivities();
             }
         }
+
+        sSpeedFont = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/FasterOne-Regular.ttf");
 
         //mActivityHelper.addActivity(ActivityHelper.createActivity());
 

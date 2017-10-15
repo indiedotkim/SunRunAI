@@ -37,6 +37,8 @@ public class ActivityView extends LinearLayout {
     private JSONObject mActivity;
     private JSONObject mActivityActual;
 
+    private GridView mViewActivityDetailsView;
+
     private ActivityDetailsAdapter mActivityDetailsAdapter;
 
     public ActivityView(Context context, AttributeSet attrs, int position, JSONObject activity, JSONObject activityActual) {
@@ -56,6 +58,8 @@ public class ActivityView extends LinearLayout {
         } catch (JSONException e) {
             // No problem.
         }
+
+        mViewActivityDetailsView = (GridView)findViewById(R.id.activitydetailsview);
 
         setViewValues();
     }
@@ -85,8 +89,6 @@ public class ActivityView extends LinearLayout {
     }
 
     private void setViewValues() {
-        GridView view = (GridView)findViewById(R.id.activitydetailsview);
-
         JSONArray details = null; // new JSONArray((Collection)mPlan.getField("details"));
 
         try {
@@ -95,8 +97,8 @@ public class ActivityView extends LinearLayout {
             e.printStackTrace();
         }
 
-        mActivityDetailsAdapter = new ActivityDetailsAdapter(view.getContext(), mPosition, details, null, mActivity, mActivityActual);
+        mActivityDetailsAdapter = new ActivityDetailsAdapter(mViewActivityDetailsView.getContext(), mPosition, details, null, mActivity, mActivityActual);
 
-        view.setAdapter(mActivityDetailsAdapter);
+        mViewActivityDetailsView.setAdapter(mActivityDetailsAdapter);
     }
 }
