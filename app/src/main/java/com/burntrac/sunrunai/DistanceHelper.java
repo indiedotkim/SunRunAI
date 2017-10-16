@@ -44,6 +44,19 @@ public class DistanceHelper {
         }
     }
 
+    public static float plainDistance(Context context, float distance, int distancetype) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean useMetric = sharedPrefs.getBoolean(SettingsActivity.PREF_USE_METRIC, SettingsActivity.DEFAULT_USE_METRIC);
+
+        if (useMetric && distancetype == 3) {
+            return distance * 1.60934f;
+        } else if (!useMetric && distancetype == 2) {
+            return distance / 1.60934f;
+        } else {
+            return distance;
+        }
+    }
+
     public static float getMetric(float distance, boolean isMetric) {
         if (!isMetric) {
             return distance * 1.60934f;

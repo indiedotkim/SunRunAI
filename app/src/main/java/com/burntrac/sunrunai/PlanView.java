@@ -1,7 +1,9 @@
 package com.burntrac.sunrunai;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -42,7 +45,7 @@ public class PlanView extends LinearLayout {
 
     private Context mContext;
     private int mPosition;
-    private static Date sDate = new Date();
+    private static Date sDate = DateHelper.getMidnight(new Date());
     private View mValue;
     private Document mPlan;
 

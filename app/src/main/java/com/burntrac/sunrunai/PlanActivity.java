@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -90,6 +91,22 @@ public class PlanActivity extends AppCompatActivity {
             }
         });
 
+        int personalize = sharedPrefs.getInt(SettingsActivity.PREF_PERSONALIZE, SettingsActivity.DEFAULT_PERSONALIZE);
+        Spinner personalizeSpinner = (Spinner)findViewById(R.id.personalization);
+        personalizeSpinner.setSelection(personalize);
+
+        personalizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                sharedPrefs.edit().putInt(SettingsActivity.PREF_PERSONALIZE, i).commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                Log.d("sdlkfjsdf", "sdlfjsd");
+            }
+        });
 
         ListView view = (ListView)findViewById(R.id.planlist);
         mPlanAdapter = new PlanAdapter(view.getContext());

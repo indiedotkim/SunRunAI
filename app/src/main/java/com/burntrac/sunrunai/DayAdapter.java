@@ -116,24 +116,30 @@ public class DayAdapter extends BaseAdapter {
             int change = 0;
             String reason = "";
 
+            Date today = DateHelper.getMidnight(new Date());
+            Date viewStart = DateHelper.getNDaysAhead(mStart, position);
+            int offset = (int)((viewStart.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+
             if (AI.isActivated && AI.valuesValid) {
-                if (position > 0) {
-                    if (AI.swap.containsKey(position - 1)) {
-                        documentPosition = AI.swap.get(position - 1) + 1;
-                        change = position - documentPosition;
-                        reason = AI.reason.get(position - 1);
+                if (offset > 0) {
+                    int relPosition = offset;
 
-                        position = documentPosition;
-                    } else if (AI.swapInv.containsKey(position - 1)) {
-                        documentPosition = AI.swapInv.get(position - 1) + 1;
-                        change = position - documentPosition;
+                    if (AI.swap.containsKey(relPosition - 1)) {
+                        documentPosition = AI.swap.get(relPosition - 1) + 1;
+                        change = relPosition - documentPosition;
+                        reason = AI.reason.get(relPosition - 1);
 
-                        position = documentPosition;
+                        position = hardPosition - change;
+                    } else if (AI.swapInv.containsKey(relPosition - 1)) {
+                        documentPosition = AI.swapInv.get(relPosition - 1) + 1;
+                        change = relPosition - documentPosition;
+
+                        position = hardPosition - change;
                     }
                 }
             }
 
-            Date viewStart = DateHelper.getNDaysAhead(mStart, position);
+            viewStart = DateHelper.getNDaysAhead(mStart, position);
             Date viewEnd = DateHelper.getNDaysAhead(mStart, position + 1);
 
             activities = MainActivity.sActivityHelper.getActivities(viewStart, viewEnd, false);

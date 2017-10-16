@@ -34,11 +34,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="8dp"
-        android:animationCache="true"
+        android:animationCache="false"
         android:columnWidth="96dp"
         android:gravity="center"
         android:numColumns="auto_fit"
-        android:scrollingCache="true"
+        android:scrollingCache="false"
         android:smoothScrollbar="true"
         android:verticalSpacing="12dp"
         app:layout_constraintBottom_toTopOf="@+id/toolbar"
@@ -309,5 +309,32 @@
         app:layout_constraintRight_toRightOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
         app:srcCompat="@drawable/trophy_king" />
+
+    <TextView
+        android:id="@+id/aistatuslabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:text="AI Status"
+        android:textAlignment="textEnd"
+        android:textColor="@color/colorCardPlanned"
+        android:textSize="12sp"
+        app:layout_constraintRight_toLeftOf="@+id/aiimage"
+        app:layout_constraintTop_toBottomOf="@+id/aistatus" />
+
+    <TextView
+        android:id="@+id/aistatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="12dp"
+        android:text="OFF"
+        android:textAlignment="textEnd"
+        android:textColor="@color/colorCardPlanned"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintRight_toLeftOf="@+id/aiimage"
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
 </android.support.constraint.ConstraintLayout>

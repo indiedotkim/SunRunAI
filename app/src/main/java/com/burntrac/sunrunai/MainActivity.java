@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         //mActivityHelper.addActivity(ActivityHelper.createActivity());
 
+        final TextView aiStatus = (TextView)findViewById(R.id.aistatus);
         final ImageView aiImage = (ImageView)findViewById(R.id.aiimage);
         final Switch aiSwitch = (Switch)findViewById(R.id.aiswitch);
         aiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -94,12 +95,14 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
                     AI.getOptimizedPlan(getApplicationContext());
                     AI.isActivated = true;
+                    aiStatus.setText("ON");
 
                     mDayAdapter.notifyDataSetChanged();
                 } else {
                     aiImage.setImageResource(R.drawable.ai_grey);
 
                     AI.isActivated = false;
+                    aiStatus.setText("ON");
 
                     mDayAdapter.notifyDataSetChanged();
                 }
@@ -459,6 +462,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     }
 
     public void switchViaImage(View view) {
+        TextView aiStatus = (TextView)findViewById(R.id.aistatus);
         ImageView aiImage = (ImageView)findViewById(R.id.aiimage);
         Switch aiSwitch = (Switch)findViewById(R.id.aiswitch);
 
@@ -471,12 +475,14 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
             AI.getOptimizedPlan(getApplicationContext());
             AI.isActivated = true;
+            aiStatus.setText("ON");
 
             mDayAdapter.notifyDataSetChanged();
         } else {
             aiImage.setImageResource(R.drawable.ai_grey);
 
             AI.isActivated = false;
+            aiStatus.setText("OFF");
 
             mDayAdapter.notifyDataSetChanged();
         }
@@ -489,6 +495,18 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             trophyText3.setText("" + String.format("%.0f", Math.ceil((float) withActual / (float) totalPlanned * 100)) + "%");
         } else {
             trophyText3.setText("0%");
+        }
+
+        ImageView trophyImage = (ImageView)findViewById(R.id.trophyimage);
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int personalize = sharedPrefs.getInt(SettingsActivity.PREF_PERSONALIZE, SettingsActivity.DEFAULT_PERSONALIZE);
+
+        if (personalize == 0) {
+            trophyImage.setImageResource(R.drawable.trophy_queen);
+        } else if (personalize == 1) {
+            trophyImage.setImageResource(R.drawable.trophy_person);
+        } else {
+            trophyImage.setImageResource(R.drawable.trophy_king);
         }
     }
 }

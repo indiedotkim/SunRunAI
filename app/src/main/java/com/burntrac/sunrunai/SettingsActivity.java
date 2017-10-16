@@ -10,9 +10,11 @@ import android.view.MenuItem;
 public class SettingsActivity extends AppCompatActivity {
     public static final String PREF_USE_METRIC = "pref_sunrunai_usemetric";
     public static final String PREF_RANDOMIZE = "pref_sunrunai_randomize";
+    public static final String PREF_PERSONALIZE = "pref_sunrunai_personalize";
 
     public static final boolean DEFAULT_USE_METRIC = true;
     public static final boolean DEFAULT_RANDOMIZE = false;
+    public static final int DEFAULT_PERSONALIZE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
