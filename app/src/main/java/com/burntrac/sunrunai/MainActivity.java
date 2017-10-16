@@ -129,6 +129,10 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         View view = getLayoutInflater().inflate(R.layout.dialog_intro, null);
+
+        TextView header = view.findViewById(R.id.dialogintrosunrunai);
+        header.setTypeface(MainActivity.sSpeedFont);
+
         builder.setView(view);
         builder.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
             @Override
@@ -226,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
                 });
 
                 builder.setView(view);
-                builder.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                     }
