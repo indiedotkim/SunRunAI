@@ -103,6 +103,11 @@ public class AI {
     public static void getOptimizedPlan(Context context) {
         valuesValid = false;
 
+        swap.put(1, 2);
+        swapInv.put(2, 1);
+        reason.put(1, "debug");
+        AI.valuesValid = true;
+
         if (WeatherWrapper.getDaysWithDataAvailable() <= 2) {
             return;
         }

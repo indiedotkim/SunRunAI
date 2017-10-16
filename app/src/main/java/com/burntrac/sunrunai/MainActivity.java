@@ -159,6 +159,29 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
          */
     }
 
+    public void showDialogTrophies(View mainActivity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_trophies, null);
+
+        TextView header = view.findViewById(R.id.dialogtrophiesheader);
+        header.setTypeface(MainActivity.sSpeedFont);
+
+        builder.setView(view);
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+            }
+        });
+
+        dialog.show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

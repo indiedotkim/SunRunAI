@@ -132,15 +132,87 @@ public class DayView extends LinearLayout {
     }
 
     public void showDialog() {
+        if (mActivities != null &&
+            mActivities.size() > 0 &&
+            ((JSONObject)mActivities.get(0)).has("details")) {
+
+            try {
+                JSONObject activity = (JSONObject)mActivities.get(0);
+
+                Long datetime = activity.getLong("datetime");
+                Date activityDate = new Date(activity.getLong("datetime"));
+                Long change = activity.has("sunrunai_change") ? activity.getLong("sunrunai_change") : 0;
+
+                if (change != 0) {
+                    showDialogConfirm(datetime);
+                } else {
+                    showDialogAchievement();
+                }
+            } catch (Exception e) {
+                // Too late...
+            }
+        }
+    }
+
+    public void showDialogConfirm(final long datetime) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        final View view = ((LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_ai_confirm, null);
+
+        TextView dialogDayHeader = (TextView)view.findViewById(R.id.dialogconfirmheader);
+        dialogDayHeader.setTypeface(MainActivity.sSpeedFont);
+
+        builder.setView(view);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+
+        builder.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //JSONObject activity = ActivityHelper.createActivity("Achievement", null, mDate, 0, details);
+
+                //Map activityMap = ActivityHelper.jsonObjectToMap(activity);
+                JSONObject activity;
+                try {
+                    activity = (JSONObject)mActivities.get(0);
+                    activity.put("sunrunai_fixed", true);
+                } catch (JSONException e) {
+                    // Ignore.
+
+                    return;
+                }
+
+                MainActivity.sActivityHelper.addActivity(ActivityHelper.jsonObjectToMap(activity));
+
+                mDayAdapter.notifyDataSetChanged();
+                mActivityAdapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void showDialogAchievement() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         final View view = ((LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_day, null);
 
         TextView dialogDayHeader = (TextView)view.findViewById(R.id.dialogdayheader);
         dialogDayHeader.setTypeface(MainActivity.sSpeedFont);
 
+        boolean isFuture = mDate.getTime() > DateHelper.getMidnight(new Date()).getTime();
+
         final SeekBar distanceBar = (SeekBar)view.findViewById(R.id.dayactualslider);
-        TextView dayFutureMessage= (TextView)view.findViewById(R.id.dayfuturemessage);
-        if (mDate.getTime() > DateHelper.getMidnight(new Date()).getTime()) {
+        TextView dayFutureMessage = (TextView)view.findViewById(R.id.dayfuturemessage);
+        if (isFuture) {
             dayFutureMessage.setVisibility(VISIBLE);
             distanceBar.setEnabled(true);
         } else {
@@ -155,7 +227,10 @@ public class DayView extends LinearLayout {
             ((JSONObject)mActivities.get(0)).has("details")) {
 
             try {
-                metricDistance = ActivityHelper.getDetailsDistanceSum(((JSONObject)mActivities.get(0)).getJSONArray("details"));
+                JSONObject activity = (JSONObject)mActivities.get(0);
+
+                Date activityDate = new Date(activity.getLong("datetime"));
+                metricDistance = ActivityHelper.getDetailsDistanceSum(activity.getJSONArray("details"));
             } catch (Exception e) {
                 // Too late...
             }
@@ -192,7 +267,7 @@ public class DayView extends LinearLayout {
             }
         });
 
-        if (mDate.getTime() <= DateHelper.getMidnight(new Date()).getTime()) {
+        if (!isFuture) {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

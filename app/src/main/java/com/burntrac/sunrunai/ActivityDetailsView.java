@@ -248,7 +248,10 @@ public class ActivityDetailsView extends LinearLayout {
                     mViewDateOrdinal.setText(DateHelper.formatDateSuffix(activityDate));
                 } else {
                     // Inside day view.
-                    mViewDeltaDays.setText(mActivity.get("sunrunai_change").toString());
+                    int change = mActivity.has("sunrunai_change") ? mActivity.getInt("sunrunai_change") : 0;
+                    String changeString = change > 0 ? "+" + change : "" + change;
+
+                    mViewDeltaDays.setText(changeString);
                     mViewAnnotation.setText(mActivity.get("sunrunai_reason").toString());
 
                     if ((int)mActivity.get("sunrunai_change") != 0) {
