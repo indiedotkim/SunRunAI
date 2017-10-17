@@ -247,6 +247,9 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
                 View view = getLayoutInflater().inflate(R.layout.dialog_info, null);
 
+                TextView dialogTitle = view.findViewById(R.id.dialoginfotitle);
+                dialogTitle.setTypeface(MainActivity.sSpeedFont);
+
                 final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 boolean randomize = sharedPrefs.getBoolean(SettingsActivity.PREF_RANDOMIZE, SettingsActivity.DEFAULT_RANDOMIZE);
 
