@@ -11,6 +11,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import im.delight.android.ddp.db.Collection;
 import im.delight.android.ddp.db.Database;
@@ -100,12 +102,22 @@ public class PlanAdapter extends BaseAdapter {
         final float metricGoalDiff = useMetric ? PlanActivity.userGoalDiff : DistanceHelper.getMetric(PlanActivity.userGoalDiff, false);
         LinkedList<LinkedHashMap> goals = new LinkedList<>();
         for (Document document : documentArray) {
+            List<String> fieldNames = Arrays.asList(document.getFieldNames());
             LinkedHashMap goal = ActivityHelper.findGoal(document);
 
             goal.put("selfreference", document);
 
-            if ((double)document.getField("competitiondistance") >= metricGoal - metricGoalDiff &&
-                (double)document.getField("competitiondistance") <= metricGoal + metricGoalDiff) {
+            double competitionDistance;
+            Object distanceObject = fieldNames.indexOf("competitiondistance") >= 0 ? document.getField("competitiondistance") : null;
+            if (distanceObject == null) {
+                competitionDistance = 0;
+            } if (distanceObject instanceof Integer) {
+                competitionDistance = ((Integer)distanceObject).doubleValue();
+            } else {
+                competitionDistance = (double)distanceObject;
+            }
+            if (competitionDistance >= metricGoal - metricGoalDiff &&
+                competitionDistance <= metricGoal + metricGoalDiff) {
                 goals.add(goal);
             }
         }
