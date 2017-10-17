@@ -38,6 +38,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import im.delight.android.ddp.db.Document;
 import im.delight.android.ddp.db.memory.InMemoryDatabase;
 import im.delight.android.ddp.Meteor;
@@ -60,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
     private String activityId;
     private String activityPlanId;
     private String activityTypesId;
+
+    private boolean mIsLocked = true;
+    private float mPercentage = 0;
+    private int mFixed = 0;
+    private int mHarsh = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +176,38 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
 
         TextView header = view.findViewById(R.id.dialogtrophiesheader);
         header.setTypeface(MainActivity.sSpeedFont);
+
+        TextView trophyText1 = view.findViewById(R.id.dialogtrophies1);
+        TextView trophyText2 = view.findViewById(R.id.dialogtrophies2);
+        TextView trophyText3 = view.findViewById(R.id.dialogtrophies3);
+
+        trophyText1.setText("" + mFixed);
+        trophyText2.setText("" + mHarsh);
+        trophyText3.setText("" + String.format("%.0f", mPercentage) + "%");
+
+        TextView dialogTrophiesTitle = view.findViewById(R.id.dialogtrophiestitle);
+        ImageView trophyImage = (ImageView)view.findViewById(R.id.dialogtrophiestrophy);
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int personalize = sharedPrefs.getInt(SettingsActivity.PREF_PERSONALIZE, SettingsActivity.DEFAULT_PERSONALIZE);
+
+        if (personalize == 0) {
+            trophyImage.setImageResource(R.drawable.trophy_queen);
+            dialogTrophiesTitle.setText("Running Queen");
+        } else if (personalize == 1) {
+            trophyImage.setImageResource(R.drawable.trophy_person);
+            dialogTrophiesTitle.setText("Running Champion");
+        } else {
+            trophyImage.setImageResource(R.drawable.trophy_king);
+            dialogTrophiesTitle.setText("Running King");
+        }
+
+        ImageView lock = (ImageView)view.findViewById(R.id.dialogtrophylock);
+
+        if (mIsLocked) {
+            lock.setVisibility(View.VISIBLE);
+        } else {
+            lock.setVisibility(View.INVISIBLE);
+        }
 
         builder.setView(view);
         builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
@@ -515,12 +554,24 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
         }
     }
 
-    public void setTrophies(int totalPlanned, int withActual) {
+    public void setTrophies(int totalPlanned, int withActual, int fixed, int harsh) {
+        TextView trophyText1 = (TextView)findViewById(R.id.trophytext1);
+        TextView trophyText2 = (TextView)findViewById(R.id.trophytext2);
         TextView trophyText3 = (TextView)findViewById(R.id.trophytext3);
 
+        mFixed = fixed;
+        mHarsh = harsh;
+
+        trophyText1.setText("" + mFixed);
+        trophyText2.setText("" + mHarsh);
+
         if (totalPlanned > 0) {
-            trophyText3.setText("" + String.format("%.0f", Math.ceil((float) withActual / (float) totalPlanned * 100)) + "%");
+            mPercentage = (float)Math.ceil((float) withActual / (float) totalPlanned * 100);
+
+            trophyText3.setText("" + String.format("%.0f", mPercentage) + "%");
         } else {
+            mPercentage = 0;
+
             trophyText3.setText("0%");
         }
 
@@ -534,6 +585,15 @@ public class MainActivity extends AppCompatActivity implements MeteorCallback, A
             trophyImage.setImageResource(R.drawable.trophy_person);
         } else {
             trophyImage.setImageResource(R.drawable.trophy_king);
+        }
+
+        mIsLocked = !(fixed >= 6 && harsh >= 4 && mPercentage >= 2);
+
+        ImageView lock = (ImageView)findViewById(R.id.trophylock);
+        if (mIsLocked) {
+            lock.setVisibility(View.VISIBLE);
+        } else {
+            lock.setVisibility(View.INVISIBLE);
         }
     }
 }

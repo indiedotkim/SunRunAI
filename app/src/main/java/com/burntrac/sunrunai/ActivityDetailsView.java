@@ -254,7 +254,9 @@ public class ActivityDetailsView extends LinearLayout {
                     mViewDeltaDays.setText(changeString);
                     mViewAnnotation.setText(mActivity.get("sunrunai_reason").toString());
 
-                    if ((int)mActivity.get("sunrunai_change") != 0) {
+                    if (mActivity.has("sunrunai_fixed") && (boolean)mActivity.get("sunrunai_fixed")) {
+                        mViewTypeIcon.setImageResource(R.drawable.ic_0922_link);
+                    } else if ((int)mActivity.get("sunrunai_change") != 0) {
                         mViewTypeIcon.setImageResource(R.drawable.ic_robot);
                     } else {
                         mViewTypeIcon.setImageResource(R.drawable.ic_0852_clipboard4_blank);

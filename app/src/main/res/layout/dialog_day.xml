@@ -147,4 +147,37 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/dialogdaygains"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gains:"
+        android:textSize="12sp"
+        app:layout_constraintRight_toLeftOf="@+id/dialogdaygaindetails"
+        android:layout_marginRight="9dp"
+        app:layout_constraintTop_toTopOf="@+id/dialogdaygainicon"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/dialogdaygaindetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+1 Daredevil Honor"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintRight_toLeftOf="@+id/dialogdaygainicon"
+        android:layout_marginRight="8dp"
+        app:layout_constraintTop_toTopOf="@+id/dialogdaygains"
+        android:layout_marginTop="0dp" />
+
+    <ImageView
+        android:id="@+id/dialogdaygainicon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:srcCompat="@drawable/trophy_honors"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/textView21"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
 </android.support.constraint.ConstraintLayout>

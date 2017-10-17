@@ -144,17 +144,19 @@ public class DayView extends LinearLayout {
                 Long change = activity.has("sunrunai_change") ? activity.getLong("sunrunai_change") : 0;
 
                 if (change != 0) {
-                    showDialogConfirm(datetime);
-                } else {
-                    showDialogAchievement();
+                    showDialogConfirm();
+
+                    return;
                 }
             } catch (Exception e) {
                 // Too late...
             }
         }
+
+        showDialogAchievement();
     }
 
-    public void showDialogConfirm(final long datetime) {
+    public void showDialogConfirm() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         final View view = ((LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.dialog_ai_confirm, null);
 
@@ -177,6 +179,13 @@ public class DayView extends LinearLayout {
                 JSONObject activity;
                 try {
                     activity = (JSONObject)mActivities.get(0);
+
+                    int change = activity.getInt("sunrunai_change");
+                    Date datetime = DateHelper.getNDaysAhead(new Date(activity.getLong("datetime")), change);
+
+                    MainActivity.sActivityHelper.removeActivity(ActivityHelper.jsonObjectToMap(activity));
+
+                    activity.put("datetime", datetime.getTime());
                     activity.put("sunrunai_fixed", true);
                 } catch (JSONException e) {
                     // Ignore.
@@ -185,6 +194,9 @@ public class DayView extends LinearLayout {
                 }
 
                 MainActivity.sActivityHelper.addActivity(ActivityHelper.jsonObjectToMap(activity));
+
+                // AI is still on at this point...
+                AI.getOptimizedPlan(mContext);
 
                 mDayAdapter.notifyDataSetChanged();
                 mActivityAdapter.notifyDataSetChanged();
@@ -210,14 +222,32 @@ public class DayView extends LinearLayout {
 
         boolean isFuture = mDate.getTime() > DateHelper.getMidnight(new Date()).getTime();
 
+        TextView dialogGains = view.findViewById(R.id.dialogdaygains);
+        TextView dialogGainDetails = view.findViewById(R.id.dialogdaygaindetails);
+        ImageView dialogGainIcon = view.findViewById(R.id.dialogdaygainicon);
+
         final SeekBar distanceBar = (SeekBar)view.findViewById(R.id.dayactualslider);
         TextView dayFutureMessage = (TextView)view.findViewById(R.id.dayfuturemessage);
         if (isFuture) {
             dayFutureMessage.setVisibility(VISIBLE);
-            distanceBar.setEnabled(true);
+            distanceBar.setEnabled(false);
+
+            dialogGains.setVisibility(GONE);
+            dialogGainDetails.setVisibility(GONE);
+            dialogGainIcon.setVisibility(GONE);
         } else {
             dayFutureMessage.setVisibility(GONE);
-            distanceBar.setEnabled(false);
+            distanceBar.setEnabled(true);
+
+            if (WeatherWrapper.getRainValue(DateHelper.getMidnight(mDate)) > 0.1) {
+                dialogGains.setVisibility(VISIBLE);
+                dialogGainDetails.setVisibility(VISIBLE);
+                dialogGainIcon.setVisibility(VISIBLE);
+            } else {
+                dialogGains.setVisibility(GONE);
+                dialogGainDetails.setVisibility(GONE);
+                dialogGainIcon.setVisibility(GONE);
+            }
         }
 
         float metricDistance = 0;
@@ -284,6 +314,13 @@ public class DayView extends LinearLayout {
                             useMetric ? 2 : 3);
                     JSONObject activity = ActivityHelper.createActivity("Achievement", null, mDate, 0, details);
 
+                    if (WeatherWrapper.getRainValue(DateHelper.getMidnight(mDate)) > 0.1) {
+                        try {
+                            activity.put("sunrunai_isharsh", true);
+                        } catch (JSONException e) {
+                            // Ignore.
+                        }
+                    }
                     Map activityMap = ActivityHelper.jsonObjectToMap(activity);
                     MainActivity.sActivityHelper.addActivity(activityMap);
 

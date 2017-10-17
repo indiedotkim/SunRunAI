@@ -162,22 +162,25 @@ public class ActivityHelper extends SQLiteOpenHelper {
         return activities;
     }
 
-    public synchronized long addActivity(Map activity) {
-        SQLiteDatabase db = null;
-        SQLiteDatabase rdb = getReadableDatabase();
-
+    public synchronized int removeActivity(Map activity) {
         String whereClause_ = "schedule == " + activity.get("schedule") + " AND datetime == " + activity.get("datetime");
         String whereClause = " WHERE " + whereClause_ + ";";
-        Cursor cursor = rdb.rawQuery("SELECT json FROM " + TABLE_NAME + whereClause, null);
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT json FROM " + TABLE_NAME + whereClause, null);
 
         if (cursor.getCount() > 0) {
             cursor.close();
 
-            db = getWritableDatabase();
-            db.delete(TABLE_NAME, whereClause_, new String[] {});
+            SQLiteDatabase db = getWritableDatabase();
+            return db.delete(TABLE_NAME, whereClause_, new String[] {});
         } else {
             cursor.close();
         }
+
+        return 0;
+    }
+
+    public synchronized long addActivity(Map activity) {
+        removeActivity(activity);
 
         ///
 
@@ -203,7 +206,7 @@ public class ActivityHelper extends SQLiteOpenHelper {
 
         JSONObject object = new JSONObject(activity);
 
-        db = db != null ? db : getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         ContentValues content = new ContentValues();
 

@@ -127,12 +127,13 @@ public class DayAdapter extends BaseAdapter {
                     if (AI.swap.containsKey(relPosition - 1)) {
                         documentPosition = AI.swap.get(relPosition - 1) + 1;
                         change = relPosition - documentPosition;
-                        reason = AI.reason.get(relPosition - 1);
+                        // reason = AI.reason.get(relPosition - 1);
 
                         position = hardPosition - change;
                     } else if (AI.swapInv.containsKey(relPosition - 1)) {
                         documentPosition = AI.swapInv.get(relPosition - 1) + 1;
                         change = relPosition - documentPosition;
+                        reason = AI.reason.get(documentPosition - 1);
 
                         position = hardPosition - change;
                     }
@@ -227,6 +228,8 @@ public class DayAdapter extends BaseAdapter {
             return;
         }
 
+        int fixed = 0;
+        int harsh = 0;
         int totalPlanned = 0;
         int withActual = 0;
 
@@ -239,13 +242,31 @@ public class DayAdapter extends BaseAdapter {
 
             if (activities != null && activities.size() > 0) {
                 totalPlanned++;
+
+                JSONObject activity = (JSONObject)activities.get(0);
+                try {
+                    if (activity.has("sunrunai_fixed") && activity.getBoolean("sunrunai_fixed")) {
+                        fixed++;
+                    }
+                } catch (JSONException e) {
+                    // Ignore.
+                }
             }
 
             if (activitiesActual != null && activitiesActual.size() > 0) {
                 withActual++;
+
+                JSONObject activity = (JSONObject)activitiesActual.get(0);
+                try {
+                    if (activity.has("sunrunai_isharsh") && activity.getBoolean("sunrunai_isharsh")) {
+                        harsh++;
+                    }
+                } catch (JSONException e) {
+                    // Ignore.
+                }
             }
         }
 
-        mMain.setTrophies(totalPlanned, withActual);
+        mMain.setTrophies(totalPlanned, withActual, fixed, harsh);
     }
 }

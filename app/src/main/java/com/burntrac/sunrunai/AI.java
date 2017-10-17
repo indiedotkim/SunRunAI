@@ -103,10 +103,12 @@ public class AI {
     public static void getOptimizedPlan(Context context) {
         valuesValid = false;
 
+        /*
         swap.put(1, 2);
         swapInv.put(2, 1);
         reason.put(1, "debug");
         AI.valuesValid = true;
+         */
 
         if (WeatherWrapper.getDaysWithDataAvailable() <= 2) {
             return;
@@ -198,6 +200,20 @@ public class AI {
 
             for (JSONObject activity : activities) {
                 if (!activity.has("details")) {
+                    continue;
+                }
+
+                try {
+                    if (activity.has("sunrunai_fixed") && activity.getBoolean("sunrunai_fixed")) {
+                        dates.add(from);
+                        types.add("fixed");
+                        indices.add(ahead - 1);
+
+                        determineCategories();
+
+                        continue;
+                    }
+                } catch (JSONException e) {
                     continue;
                 }
 
@@ -371,18 +387,6 @@ public class AI {
                 }
             }
         }
-
-        /*
-        Log.d("x", "" + DateHelper.getNDaysAhead(today, 1));
-        for (int src : swap.keySet()) {
-            int dest = swap.get(src);
-
-            Log.d("x", "SWAPPING " + types.get(src) + " with " + types.get(dest));
-            Log.d("x", " - " + dates.get(src) + " with " + dates.get(dest));
-            Log.d("x", " reason: " + reason.get(src));
-        }
-        Log.d("x", "y");
-         */
 
         valuesValid = true;
     }

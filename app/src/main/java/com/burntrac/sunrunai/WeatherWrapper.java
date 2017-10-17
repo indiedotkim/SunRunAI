@@ -46,8 +46,6 @@ public class WeatherWrapper extends ResultReceiver {
 
     public static Context sContext;
 
-    private static Random random = new Random(0);
-
     private WeatherWrapper(Handler handler, OnCompletionListener completionListener) {
         super(handler);
 
@@ -185,7 +183,14 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static float getRainValue(Date date) {
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(sContext);
+        boolean randomize = sharedPrefs.getBoolean(SettingsActivity.PREF_RANDOMIZE, SettingsActivity.DEFAULT_RANDOMIZE);
+
         JSONObject object = getObjectForDate(date);
+
+        if (randomize && date.getTime() == DateHelper.getMidnight(new Date()).getTime()) {
+            return 2.6f;
+        }
 
         if (object == null) {
             return 0f;
@@ -193,6 +198,10 @@ public class WeatherWrapper extends ResultReceiver {
 
         try {
             if (object.has("qpf")) {
+                if (randomize) {
+                    return Math.round((10f * new Random(date.getTime() / 1000).nextFloat()));
+                }
+
                 return Float.valueOf(object.getString("qpf"));
             }
         } catch (JSONException e) {
@@ -203,21 +212,17 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static String getRain(Date date) {
-        JSONObject object = getObjectForDate(date);
+        float rain = getRainValue(date);
 
-        if (object == null) {
-            return "";
+        if (rain == 0) {
+            return "-";
         }
 
-        try {
-            if (object.has("qpf")) {
-                return object.getString("qpf") + getPrecipitationUnit();
-            }
-        } catch (JSONException e) {
-            // Ignore. Too late to catch here.
+        if (rain >= 10) {
+            return String.format("%.0f", rain) + getPrecipitationUnit();
+        } else {
+            return String.format("%.1f", rain) + getPrecipitationUnit();
         }
-
-        return "-";
     }
 
     public static float getTemperatureValue(Date date) {
@@ -308,11 +313,10 @@ public class WeatherWrapper extends ResultReceiver {
         try {
             if (object.has("max_temp")) {
                 if (randomize) {
-                    random = new Random(date.getTime());
-                    return Math.round((22f - 10f * (random.nextFloat() - 0.5f)) * 10f) / 10f;
-                } else {
-                    return object.getLong("max_temp");
+                    return Math.round((22f - 10f * (new Random(date.getTime() / 1000).nextFloat() - 0.5f))) / 10f;
                 }
+
+                return object.getLong("max_temp");
             }
         } catch (JSONException e) {
             // Ignore. Too late to catch here.
@@ -336,22 +340,42 @@ public class WeatherWrapper extends ResultReceiver {
     }
 
     public static String getWindDirection(Date date) {
-        JSONObject forecast = getForecast();
+        JSONObject object = getObjectForDate(date, true);
 
-        if (forecast == null) {
-            return "";
+        if (object == null || !object.has("day")) {
+            return "-";
         }
 
-        return "NW";
+        try {
+            JSONObject day = object.getJSONObject("day");
+
+            if (day.has("wdir_cardinal")) {
+                return day.getString("wdir_cardinal");
+            }
+        } catch (JSONException e) {
+            return "-";
+        }
+
+        return "-";
     }
 
     public static String getWindSpeed(Date date) {
-        JSONObject forecast = getForecast();
+        JSONObject object = getObjectForDate(date, true);
 
-        if (forecast == null) {
+        if (object == null || !object.has("day")) {
             return "";
         }
 
-        return "12kph";
+        try {
+            JSONObject day = object.getJSONObject("day");
+
+            if (day.has("wspd")) {
+                return day.getString("wspd") + "kph";
+            }
+        } catch (JSONException e) {
+            return "";
+        }
+
+        return "";
     }
 }
